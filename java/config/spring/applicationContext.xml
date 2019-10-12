@@ -20,7 +20,13 @@
     
 	<description>Spring公共配置</description>
 	
-	<mvc:annotation-driven />
+	
+	<!--
+	<mvc:annotation-driven>
+		 SpringMvc中url有小数点 
+		<mvc:path-matching registered-suffixes-only="true"/>
+	</mvc:annotation-driven>
+		-->
 	
 	<!-- 使用annotation 自动注册bean,并检查@Required,@Autowired的属性已被注入 -->
 	<context:component-scan base-package="com.wooboo.dsp.web.controller" />

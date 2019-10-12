@@ -12,8 +12,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.servlet.ServletInputStream;
-
-import com.wooboo.dsp.model.SysUser;
 import com.wooboo.dsp.system.util.DateUtil;
 
 
@@ -214,26 +212,7 @@ public class StringUtil {
 	    }     
 	    return sb.toString();     
 	 } 
-	public static String getHoldes4user(SysUser user,String size,String type,String fontsize){
-		String[] colors = new String[]{"1bbc9b","1ba39c","ff590b","ffe600","e26a6a","f36a5a","E7505C","3598dc","36D7B7","BF55EC","4B77BE","4B77BE"};
-		StringBuffer sbuf = new StringBuffer("holder.js/"+size+"?");
-		if("xing".equals(type)){
-			if(user.getNickName().length()>=1){
-				sbuf.append("text="+user.getNickName().substring(0, 1));
-			}
-		}else if("ming".equals(type)){
-			if(user.getNickName().length()>=3){
-				sbuf.append("text="+user.getNickName().substring(1,3));
-			}else{
-				sbuf.append("text="+user.getNickName());
-			}
-		}
-		int n = user.getUserName().charAt(0);
-        String color = colors[n/colors.length];		
-		sbuf.append("&bg="+color);
-		sbuf.append("&fg=ffffff&size="+fontsize);
-		return sbuf.toString();
-	}
+	
 	
 	public static void main(String[] args) throws Exception{
 		//System.out.println(getValueBykeyFromUrl("redirect_url?code=xxx&portal_server=https://portalserver:port/portal", "portal_server"));

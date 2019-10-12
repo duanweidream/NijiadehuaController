@@ -18,7 +18,6 @@ import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import com.wooboo.dsp.base.log.Logger;
-import com.wooboo.dsp.model.SysUser;
 import com.wooboo.dsp.util.ByteHelper;
 import com.wooboo.dsp.util.StringUtil;
 
@@ -50,48 +49,8 @@ public class HttpHelp {
     	}
     	return null;
     }
-	
-	public static SysUser getUserInfo(String token,String ip){
-    	SysUser user = new SysUser();
-    	if (token != null) {
-    	    try{
-        	    byte[] cookieBytes = ByteHelper.hex2byte(token);
-                byte[] decodedBytes = decryptData(cookieBytes, KEY.getBytes());
-            	String decodedString = new String(decodedBytes);
-            	//System.out.println(decodedString+" =================");
-            	//String[] parts = decodedString.split("@");
-            	String[] parts = decodedString.split(",");
 
-            	user.setId(Long.parseLong(parts[0]));
-            	user.setUserName(parts[1]);
-            	String tip = parts[2];
-            	Long second = (System.currentTimeMillis()/1000)-Long.parseLong(parts[3]);
-            	
-            	
-            	if(StringUtil.equals(ip, tip)&&second<TIMES){
-            		return user;
-            	}
-    	    }catch(Exception e){    		
-    	    	e.printStackTrace();
-    	    }
-    	}
-        return null;
-    }
-	
-	
-	 public static String createCookie(SysUser user,String ip){
-	    	String cookie = null;
-	    	try{
-	        	String content = user.getId() + ","+user.getUserName()+ "," + ip + ","+ (System.currentTimeMillis() / 1000);
-	        	byte[] contentBytes = content.getBytes();
-	        	byte[] keyBytes = KEY.getBytes();
-	            byte[] cookieBytes = encryptData(contentBytes, keyBytes);
-	            cookie = ByteHelper.byte2hex(cookieBytes);
-	    	}catch(Exception e){    		
-	    	    e.printStackTrace();
-	    	}
-	        return cookie;
-	    } 
+
 	
 	    public static byte[] decryptData(byte[] input, byte[] key) throws Exception { 
 	        SecretKey deskey = new javax.crypto.spec.SecretKeySpec(key, ALGORITHM); 
