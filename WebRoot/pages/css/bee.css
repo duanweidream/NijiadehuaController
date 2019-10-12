@@ -1,0 +1,11 @@
+body,button, input, select, textarea,h1 ,h2, h3, h4, h5, h6 { font-family: "Arial","Microsoft YaHei","黑体","宋体",sans-serif;}
+/* .page-content .breadcrumb {margin-bottom:10px;} */
+.form-search {color:#555;font-size:12px;}
+.pagination {  margin: 5px 0;}
+.yuan {-webkit-border-radius: 6px !important;-moz-border-radius: 6px !important;border-radius: 6px !important;}
+.form-horizontal .control-group { margin-bottom: 5px; }
+.m-wrap {-webkit-border-radius: 5px !important;-moz-border-radius: 5px !important;border-radius: 5px !important;}
+.modal.fade.in {top:30%;}
+#myModalLabel{font-size:14px;font-weight:bold;}
+.portlet-title .caption {    font-size: 14px;}
+.bee-form {margin-top:0;}

@@ -1,0 +1,14 @@
+/**********************************
+
+Use: Main Screen Import
+
+***********************************/
+
+label.error 
+{ 
+color:Red; 
+font-size:13px; 
+margin-left:5px; 
+padding-left:16px; 
+background:url("error.png") left no-repeat; 
+} 
