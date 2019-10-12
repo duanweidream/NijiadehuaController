@@ -8,7 +8,7 @@ import org.apache.log4j.PropertyConfigurator;
 
 import com.wooboo.dsp.base.enums.ATTSystem;
 import com.wooboo.dsp.base.log.Logger;
-import com.wooboo.dsp.system.util.FrameCache;
+
 
 
 
@@ -24,7 +24,7 @@ public class DefaultListener implements ServletContextListener {
 		initLog();
 	}
 	public void systemContext(){
-        FrameCache.getInstance().initCache();
+        //FrameCache.getInstance().initCache();
         //System.out.println(ConstantUtil.getInstance().findNode("001"));
         
 	}
