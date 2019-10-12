@@ -1,7 +1,8 @@
 .DS_Store
 /.settings/
 /.classpath
-
+/.project
+/.mymetadata
 *.class
 *.bak
 classes/
