@@ -9,53 +9,58 @@ public class ApiError extends Exception{
 	 * 
 	 */
 	private static final long serialVersionUID = 4993240651886084140L;
-	public int errorCode;
-    private String hint;
+	public int code;
+    private String msg;
     
-    public ApiError(int errorCode, String errMessage, String errHint) {
+    public ApiError(int code, String errMessage, String msg) {
         super(errMessage);
-        this.hint = errHint;
-        
-        System.out.println(this.hint);
-        
-        this.errorCode = errorCode;
+        this.msg = msg;
+        this.code = code;
     }
     
-    public int getErrorCode() {
-		return errorCode;
+
+
+	public int getCode() {
+		return code;
 	}
 
-	public void setErrorCode(int errorCode) {
-		this.errorCode = errorCode;
+
+
+	public void setCode(int code) {
+		this.code = code;
 	}
 
-	public String getHint() {
-		return hint;
+
+
+	public String getMsg() {
+		return msg;
 	}
 
-	public void setHint(String hint) {
-		this.hint = hint;
+
+
+	public void setMsg(String msg) {
+		this.msg = msg;
 	}
+
+
 
 	public JSONObject toJSONObject() {
     	JSONObject retObj = new JSONObject();
-    	retObj.put("code", errorCode);
-    	retObj.put("error_hint", hint);
+    	retObj.put("code", code);
+    	retObj.put("msg", msg);
     	return retObj;
     }
     
     public String toString() {
-    	return "{\"error_code\":"+errorCode+", \"error_msg\":\""+getMessage()+"\", \"error_hint\":\""+hint+"\"}";
+    	return "{\"code\":"+code+", \"msg\":\""+msg+"\"}";
     }
     
     public static enum Type {
     	NO_SUCH_SERVICE(1000, "没有对应的服务"),
+    	BUSINESS_ERROR(1111, "业务错误"),
         INTERNAL_ERROR(1001, "内部错误"),
         NOT_LOGGED_IN(2001, "尚未登录"), 
-        INVALID_PARAM(3001, "参数错误"),
-        NULL_DATA(3002, "查不到相应数据"),
-        LOGIC_ERROR(3003,"逻辑错误"),
-        DB_OPERATE_ERROR(3004, "数据库操作错误");
+        INVALID_PARAM(3001, "参数错误");
        
         
         private int errorCode;

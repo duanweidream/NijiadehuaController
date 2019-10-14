@@ -38,7 +38,7 @@ public class Result {
     
     public Result() {
     	this.ret = new JSONObject();
-    	this.ret.put("code", 200);
+    	this.ret.put("code", 0);
         this.cookie = null;
     }
     
@@ -71,11 +71,11 @@ public class Result {
     	ret.put(key, value);
     }
     public void setRet(JSONObject obj){
-    	obj.put("code", 200);
+    	obj.put("code", 0);
     	this.ret = obj;
     }
     public void setRet(JSONObject obj,String cookie){
-    	obj.put("code", 200);
+    	obj.put("code", 0);
     	this.ret = obj;
     	this.cookie=cookie;
     }

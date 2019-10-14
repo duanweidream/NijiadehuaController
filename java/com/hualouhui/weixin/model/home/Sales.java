@@ -1,7 +1,6 @@
-package com.hualouhui.weixin.model;
+package com.hualouhui.weixin.model.home;
 
-import java.io.Serializable;
-public class Sales implements Serializable{
+public class Sales {
 	
 	private Long sales_id;
 	private String sort_code;
@@ -12,7 +11,6 @@ public class Sales implements Serializable{
 	private Double sales_price;
 	private Double mkt_price;
 	private String sales_img;
-	
 	public Long getSales_id() {
 		return sales_id;
 	}

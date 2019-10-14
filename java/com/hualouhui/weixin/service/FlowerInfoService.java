@@ -56,15 +56,4 @@ public class FlowerInfoService {
 		return jdbcTemplate.queryForList(sql, FlowerImg.class);
 	}
 	
-	public List<Sales> test() throws ApiError{
-		Sql sql = new Sql(" select sales_id,sales_name from goods_sales_info ");
-		sql.append(" order by modify_time desc ");
-		return jdbcTemplate.queryForList(sql, Sales.class);
-	}
-	
-	public static void main(String[] args) throws ApiError{
-		FlowerInfoService flowerInfoService = new FlowerInfoService();
-		List<Sales> salesList = flowerInfoService.test();
-		System.out.println(salesList.size());
-	}
 }
