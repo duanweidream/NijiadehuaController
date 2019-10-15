@@ -81,9 +81,7 @@ public class ActionBase {
     
     public boolean checkAuth(Parameters params,Result result) throws ApiError{
     	String cookie = params.getMyCookieValue();
-    	
-    	System.out.println("MyCookieValue:"+cookie);
-    	
+    
         user = CookieHelper.getUserInfo(cookie);
         
         System.out.println("user.id:"+user.getId());
