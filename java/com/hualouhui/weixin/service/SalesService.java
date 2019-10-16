@@ -27,10 +27,11 @@ public class SalesService {
 	}
 	
 	public Sales findSalesBySalesId(String sales_id) throws ApiError{
-		Sql sql = new Sql(" select a.sales_id,c.sort_code,c.sort_short_name,c.sort_long_name,a.sales_name,a.subtitle sales_title,a.sales_price,a.mkt_price,a.sales_img ");
-		sql.append(" from goods_sales_info a,goods_sales_sort b,goods_sort_sales c ");
-		sql.append(" where a.sales_id = b.sales_id and b.sort_id = c.id ");
+		Sql sql = new Sql(" select a.sales_id,a.sales_name,a.subtitle sales_title,a.sales_price,a.mkt_price,a.sales_img ");
+		sql.append(" from goods_sales_info a ");
+		sql.append(" where a.sales_id = ? ");
 		sql.append(" order by a.modify_time desc ");
+		sql.addParam(sales_id);
 		return jdbcTemplate.findObject(sql,Sales.class);
 	}
 }
