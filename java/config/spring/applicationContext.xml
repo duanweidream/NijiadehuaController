@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:task="http://www.springframework.org/schema/task"
+	xsi:schemaLocation=" 
+         http://www.springframework.org/schema/beans 
+         http://www.springframework.org/schema/beans/spring-beans-3.2.xsd 
+         http://www.springframework.org/schema/tx 
+         http://www.springframework.org/schema/tx/spring-tx-3.2.xsd 
+         http://www.springframework.org/schema/aop 
+         http://www.springframework.org/schema/aop/spring-aop-3.2.xsd
+         http://www.springframework.org/schema/context
+         http://www.springframework.org/schema/context/spring-context-3.2.xsd
+         http://www.springframework.org/schema/task
+         http://www.springframework.org/schema/task/spring-task-3.2.xsd
+         http://www.springframework.org/schema/mvc
+         http://www.springframework.org/schema/mvc/spring-mvc-3.2.xsd">
+    
+	<description>Spring公共配置</description>
+	
+	<mvc:annotation-driven />
+	
+	<!-- 使用annotation 自动注册bean,并检查@Required,@Autowired的属性已被注入 -->
+	<context:component-scan base-package="com.nijiadehua.api.controller" />
+	
+	<bean class="org.springframework.web.servlet.mvc.annotation.DefaultAnnotationHandlerMapping" />
+	<bean class="org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter" />
+	
+	<bean id="viewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<property name="viewClass" value="org.springframework.web.servlet.view.JstlView" />
+		<property name="prefix" value="/pages"></property>
+		<property name="suffix" value=".jsp"/>  
+	</bean>
+    <!-- jdbc.properties -->
+	<bean id="propertyConfig" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="location" value="classpath:config/jdbc.properties" />
+	</bean>
+	
+	
+	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+        <property name="driverClassName" value="${jdbc.driverClassName}"/>
+        <property name="url" value="${jdbc.url}"/>
+        <property name="username" value="${jdbc.username}"/>
+        <property name="password" value="${jdbc.password}"/>
+        <property name="maxActive" value="${jdbc.maxActive}"/>
+        <property name="maxIdle" value="${jdbc.maxIdle}"/>
+        <property name="minIdle" value="${jdbc.minIdle}"/>
+        <property name="defaultAutoCommit" value="false"/>
+        <property name="removeAbandoned" value="true"/>
+        <property name="removeAbandonedTimeout" value="${jdbc.removeAbandonedTimeout}"/>
+    </bean>
+     
+     
+	<bean id="sessionFactory" class="com.nijiadehua.api.base.system.util.AnnotationSessionFactoryBeanEx">
+		<property name="dataSource" ref="dataSource" />
+		   <property name="mappingDirectoryLocations">
+			<list>
+			</list>
+			</property>
+		<property name="annotatedClassesLocations">
+			<list>
+				<value>classpath*:com/nijiadehua/api/model/*.class</value>
+			</list>
+		</property>
+
+		<property name="excludedClassesRegexPatterns">
+			<list>
+				<value><![CDATA[^[\w\.]+Test[\w]+$]]></value>
+			</list>
+		</property>
+
+		<property name="hibernateProperties">
+			<props>
+				<prop key="hibernate.dialect">org.hibernate.dialect.MySQLDialect</prop>
+				<prop key="hibernate.format_sql">false</prop>
+				<prop key="hibernate.show_sql">false</prop>
+				<prop key="hibernate.cache.use_query_cache">true</prop>
+				<prop key="hibernate.cache.use_second_level_cache">true</prop>
+				<prop key="hibernate.cache.provider_class">org.hibernate.cache.EhCacheProvider</prop>
+			</props>
+		</property>
+	</bean>
+	<bean id="springUtil" class="com.nijiadehua.api.base.system.util.SpringUtil" scope="singleton"/>
+	<bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+        <property name="dataSource" ref="dataSource"></property>
+    </bean>
+	
+ 	<!-- 事务处理 -->
+	<bean id="transactionManager" class="org.springframework.orm.hibernate3.HibernateTransactionManager">
+		<property name="sessionFactory" ref="sessionFactory" />
+	</bean>
+	<aop:config proxy-target-class="true">
+		<aop:advisor  pointcut="execution(* com.nijiadehua.api.service.*.*Service.*(..))" advice-ref="txAdvice" />	
+	</aop:config>
+	<tx:advice id="txAdvice" transaction-manager="transactionManager">
+		<tx:attributes>
+			 <tx:method name="get*" read-only="true"/>
+			 <tx:method name="query*" read-only="true"/>
+			 <tx:method name="search*" read-only="true"/>
+			 <tx:method name="find*" read-only="true"/>
+			 <tx:method name="*" propagation="REQUIRED" rollback-for="com.nijiadehua.api.exception.ServiceException"/>
+		</tx:attributes> 
+	</tx:advice>  
+	
+</beans>
