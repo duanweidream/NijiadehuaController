@@ -12,7 +12,7 @@ import com.nijiadehua.api.base.rest.Result;
 import com.nijiadehua.api.exception.ApiError;
 import com.nijiadehua.api.model.Page;
 import com.nijiadehua.api.model.home.Sales;
-import com.nijiadehua.api.service.SalesService;
+import com.nijiadehua.api.service.SalesTest;
 import com.nijiadehua.api.util.NumberUtil;
 
 
@@ -37,7 +37,7 @@ public class SearchController{
 		
 		Page page = new Page(startIndex1, itemCount1, null);
 		
-		SalesService salesService = new SalesService();
+		SalesTest salesService = new SalesTest();
 		
 		salesService.searchSalesForPage(page, sort_code);
 		

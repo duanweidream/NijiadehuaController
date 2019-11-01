@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.nijiadehua.api.base.rest.Result;
 import com.nijiadehua.api.exception.ApiError;
 import com.nijiadehua.api.model.Sales;
-import com.nijiadehua.api.service.HomeService;
+import com.nijiadehua.api.service.HomeTest;
 import com.nijiadehua.api.util.StringUtil;
 
 @Controller
@@ -20,7 +20,7 @@ public class HomeController{
 	public Result invokeService() throws ApiError {
 		
 		try{
-			HomeService homeService = new HomeService();
+			HomeTest homeService = new HomeTest();
 			List<Sales> salesList = homeService.queryHomeSalesList();
 			for(Sales sales : salesList){
 				String sales_img = sales.getSales_img();

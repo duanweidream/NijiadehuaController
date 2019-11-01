@@ -15,7 +15,7 @@ import com.nijiadehua.api.model.Sales;
  * @Date 2019-04-16 上午10:09:34</br>
  * 
  */
-public class HomeService {
+public class HomeTest {
 
 	private JdbcTemplate jdbcTemplate = new JdbcTemplate();
 	

@@ -1,5 +1,6 @@
 package com.nijiadehua.api.controller.v1.order;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -7,6 +8,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.nijiadehua.api.base.rest.Result;
 import com.nijiadehua.api.exception.ApiError;
+import com.nijiadehua.api.exception.ServiceException;
 import com.nijiadehua.api.service.OrderService;
 import com.nijiadehua.api.util.StringUtil;
 
@@ -21,24 +23,25 @@ import com.nijiadehua.api.util.StringUtil;
 @Controller
 @RequestMapping(value="/v/1/order")
 public class CreateController{
-
+	
+	@Autowired
+	OrderService orderService;
+	
 	@ResponseBody
 	@RequestMapping(value="/create")
-	public Result create(@RequestBody String json) throws ApiError {
+	public Result create(@RequestBody String json) throws ServiceException{
 		
 		if(StringUtil.isEmpty(json)){
 			return new Result(ApiError.Type.INVALID_PARAM.toException("参数错误!"));
 		}
 		
 		try{
-			OrderService orderService = new OrderService();
 			
-			orderService.create(json);
+			orderService.createOrder(json);
 			
 			return new Result();
 		}catch (Exception e) {
-			e.printStackTrace();
-			throw ApiError.Type.BUSINESS_ERROR.toException("【V1】订单生成失败");
+			return new Result(ApiError.Type.BUSINESS_ERROR.toException("【V1】订单生成失败"));
 		}
 		
 		

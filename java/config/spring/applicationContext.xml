@@ -47,7 +47,7 @@
         <property name="maxActive" value="${jdbc.maxActive}"/>
         <property name="maxIdle" value="${jdbc.maxIdle}"/>
         <property name="minIdle" value="${jdbc.minIdle}"/>
-        <property name="defaultAutoCommit" value="false"/>
+        <!-- <property name="defaultAutoCommit" value="false"/>  -->
         <property name="removeAbandoned" value="true"/>
         <property name="removeAbandonedTimeout" value="${jdbc.removeAbandonedTimeout}"/>
     </bean>
@@ -92,14 +92,13 @@
 		<property name="sessionFactory" ref="sessionFactory" />
 	</bean>
 	<aop:config proxy-target-class="true">
-		<aop:advisor  pointcut="execution(* com.nijiadehua.api.service.*.*Service.*(..))" advice-ref="txAdvice" />	
+	<aop:advisor  pointcut="execution(* com.nijiadehua.api.service..*.*(..))" advice-ref="txAdvice" />		
 	</aop:config>
 	<tx:advice id="txAdvice" transaction-manager="transactionManager">
 		<tx:attributes>
 			 <tx:method name="get*" read-only="true"/>
 			 <tx:method name="query*" read-only="true"/>
 			 <tx:method name="search*" read-only="true"/>
-			 <tx:method name="find*" read-only="true"/>
 			 <tx:method name="*" propagation="REQUIRED" rollback-for="com.nijiadehua.api.exception.ServiceException"/>
 		</tx:attributes> 
 	</tx:advice>  

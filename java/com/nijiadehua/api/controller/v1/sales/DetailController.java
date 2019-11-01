@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.nijiadehua.api.base.rest.Result;
 import com.nijiadehua.api.exception.ApiError;
 import com.nijiadehua.api.model.Sales;
-import com.nijiadehua.api.service.SalesService;
+import com.nijiadehua.api.service.SalesTest;
 import com.nijiadehua.api.util.StringUtil;
 
 
@@ -30,7 +30,7 @@ public class DetailController{
 			return new Result(ApiError.Type.INVALID_PARAM.toException("参数错误!"));
 		}
 		
-		SalesService salesService = new SalesService();
+		SalesTest salesService = new SalesTest();
 		Sales sales = salesService.findSalesBySalesId(sales_id);
 		if(sales == null){
 			return new Result(ApiError.Type.BUSINESS_ERROR.toException("销售品不存在!"));

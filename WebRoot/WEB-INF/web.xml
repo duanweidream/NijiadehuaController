@@ -45,9 +45,8 @@
 	<servlet-mapping>
 		<servlet-name>wooboo</servlet-name>
 		<url-pattern>/</url-pattern>
-
 	</servlet-mapping>
-
+	
 	<!-- WEB层编码过滤 -->
 	<filter>
 		<filter-name>Set Character Encoding</filter-name>
