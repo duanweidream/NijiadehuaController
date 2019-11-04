@@ -41,7 +41,7 @@ public class OrderService {
 	public void createOrder(String json) throws ServiceException{
 		try {
 			
-			/*log.logInfo("json:"+json);
+			log.logInfo("json:"+json);
 			OrderCreateRequest orderCreateRequest = (OrderCreateRequest)JsonUtil.jsongToObject(json,OrderCreateRequest.class);
 			log.logInfo("sales:"+orderCreateRequest.getSales().length);
 			
@@ -74,7 +74,7 @@ public class OrderService {
 				goodsList.add(orderGoods);
 				
 			}
-			*/
+			
 			OrderInfo orderInfo = new OrderInfo();
 			orderInfo.setOrder_sort("shufa");
 			orderInfo.setOrder_amount(1D);
@@ -84,17 +84,11 @@ public class OrderService {
 			orderDao.saveObject(orderInfo);
 			orderInfo.setOrder_no(UtilFunction.getOrderNo(orderInfo.getOrder_id()));
 		
-			if(true){
-				throw new ServiceException("订单生成失败：订单号未更新");
+			for(OrderGoods good : goodsList){
+				good.setOrder_id(orderInfo.getOrder_id());
+				orderDao.saveObject(good);
 			}
 			
-			/*
-			for(OrderGoods good : goodsList){
-				//good.setOrder_id(orderInfo.getOrder_id());
-				
-				good.setOrder_id(1L);
-				orderDao.saveObject(good);
-			}*/
 			
 		} catch (Exception e) {
 			log.logError("订单生成失败",e);
