@@ -1,14 +1,13 @@
 package com.nijiadehua.api.service;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
+import com.nijiadehua.api.base.db.JdbcTemplate;
 import com.nijiadehua.api.base.log.Logger;
 import com.nijiadehua.api.dao.OrderDao;
 import com.nijiadehua.api.exception.ServiceException;
@@ -36,8 +35,7 @@ public class OrderService {
 	
 	@Autowired
 	private OrderDao orderDao;
-	
-	//@Transactional(rollbackFor = ServiceException.class)
+
 	public void createOrder(String json) throws ServiceException{
 		try {
 			
@@ -56,7 +54,7 @@ public class OrderService {
 				GoodsSalesInfo goodsSalesInfo = orderDao.getObject(sales_id,GoodsSalesInfo.class);
 				
 				if(goodsSalesInfo == null){
-					throw new ServiceException("订单生成失败：销售品【"+sales_id+"】不存在");
+					throw new ServiceException("销售品【"+sales_id+"】不存在");
 				}
 				
 				order_amount = order_amount + goodsSalesInfo.getSales_price();
@@ -77,8 +75,8 @@ public class OrderService {
 			
 			OrderInfo orderInfo = new OrderInfo();
 			orderInfo.setOrder_sort("shufa");
-			orderInfo.setOrder_amount(1D);
-			orderInfo.setPay_amount(1D);
+			orderInfo.setOrder_amount(order_amount);
+			orderInfo.setPay_amount(pay_amount);
 			orderInfo.setOrder_status(1L);
 			orderInfo.setOrder_create_time(new Date());
 			orderDao.saveObject(orderInfo);

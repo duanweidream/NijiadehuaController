@@ -41,7 +41,7 @@ public class CreateController{
 			
 			return new Result();
 		}catch (Exception e) {
-			return new Result(ApiError.Type.BUSINESS_ERROR.toException("【V1】订单生成失败"));
+			return new Result(ApiError.Type.BUSINESS_ERROR.toException(e.getMessage()));
 		}
 		
 		
