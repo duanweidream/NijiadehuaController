@@ -1,0 +1,4 @@
+订单生成：
+{"user_id":"123","sales":[{"sales_id":-23,"sales_number":1},{"sales_id":24,"sales_number":1}],"pay_type":1,"delivery":{"delivery_mode":1,"delivery_name":"123"}}
+
+
