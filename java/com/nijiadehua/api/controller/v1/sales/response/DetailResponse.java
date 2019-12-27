@@ -1,8 +1,10 @@
-package com.nijiadehua.api.model;
+package com.nijiadehua.api.controller.v1.sales.response;
 
-import java.io.Serializable;
-public class Sales implements Serializable{
-	
+import java.util.ArrayList;
+import java.util.List;
+
+public class DetailResponse {
+
 	private Long sales_id;
 	private String sort_code;
 	private String sort_short_name;
@@ -12,8 +14,7 @@ public class Sales implements Serializable{
 	private String sales_title;
 	private Double sales_price;
 	private Double mkt_price;
-	private String sales_img;
-	
+	private List<String> sales_img = new ArrayList<String>();
 	public Long getSales_id() {
 		return sales_id;
 	}
@@ -44,6 +45,12 @@ public class Sales implements Serializable{
 	public void setSales_name(String sales_name) {
 		this.sales_name = sales_name;
 	}
+	public String getArt_name() {
+		return art_name;
+	}
+	public void setArt_name(String art_name) {
+		this.art_name = art_name;
+	}
 	public String getSales_title() {
 		return sales_title;
 	}
@@ -62,17 +69,11 @@ public class Sales implements Serializable{
 	public void setMkt_price(Double mkt_price) {
 		this.mkt_price = mkt_price;
 	}
-	public String getSales_img() {
+	public List<String> getSales_img() {
 		return sales_img;
 	}
-	public void setSales_img(String sales_img) {
+	public void setSales_img(List<String> sales_img) {
 		this.sales_img = sales_img;
-	}
-	public String getArt_name() {
-		return art_name;
-	}
-	public void setArt_name(String art_name) {
-		this.art_name = art_name;
 	}
 	
 	

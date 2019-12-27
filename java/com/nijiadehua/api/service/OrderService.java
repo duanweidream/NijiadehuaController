@@ -6,16 +6,16 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import com.nijiadehua.api.base.db.JdbcTemplate;
 import com.nijiadehua.api.base.log.Logger;
 import com.nijiadehua.api.dao.OrderDao;
 import com.nijiadehua.api.exception.ServiceException;
-import com.nijiadehua.api.model.GoodsSalesInfo;
+import com.nijiadehua.api.model.GoodsStockOutbound;
 import com.nijiadehua.api.model.OrderGoods;
 import com.nijiadehua.api.model.OrderInfo;
 import com.nijiadehua.api.model.order.create.request.OrderCreateRequest;
+import com.nijiadehua.api.model.order.create.request.OrderCreateRequest.Delivery;
 import com.nijiadehua.api.model.order.create.request.OrderCreateRequest.Sales;
+import com.nijiadehua.api.model.order.create.response.OrderCreateResponse;
 import com.nijiadehua.api.util.JsonUtil;
 import com.nijiadehua.api.util.UtilFunction;
 
@@ -36,12 +36,23 @@ public class OrderService {
 	@Autowired
 	private OrderDao orderDao;
 
-	public void createOrder(String json) throws ServiceException{
+	public OrderCreateResponse createOrder(String json) throws ServiceException{
 		try {
 			
 			log.logInfo("json:"+json);
 			OrderCreateRequest orderCreateRequest = (OrderCreateRequest)JsonUtil.jsongToObject(json,OrderCreateRequest.class);
-			log.logInfo("sales:"+orderCreateRequest.getSales().length);
+			
+			if(null == orderCreateRequest){
+				throw new ServiceException("请求参数错误");
+			}
+			
+			Delivery delivery = orderCreateRequest.getDelivery();
+			
+			if(null == delivery){
+				throw new ServiceException("收货信息为空");
+			}
+			
+			Date current_time = new Date();
 			
 			double order_amount = 0;
 			double pay_amount = 0;
@@ -49,36 +60,73 @@ public class OrderService {
 			for(Sales sales : orderCreateRequest.getSales()){
 				Long sales_id = sales.getSales_id();
 				int sales_number = sales.getSales_number();
-				log.logInfo("sales_id:"+sales_id+" sales_number:"+sales_number);	
 				
-				GoodsSalesInfo goodsSalesInfo = orderDao.getObject(sales_id,GoodsSalesInfo.class);
+				//a.sales_id,a.product_id,a.sales_name,b.product_name,a.sales_price,a.mkt_price,a.sales_img,b.ava_stock,b.product_spec
+				Object[] salesProd = orderDao.querySalesProdInfoBySalesId(sales_id);
 				
-				if(goodsSalesInfo == null){
+				if(salesProd == null){
 					throw new ServiceException("销售品【"+sales_id+"】不存在");
 				}
 				
-				order_amount = order_amount + goodsSalesInfo.getSales_price();
-				pay_amount = pay_amount + goodsSalesInfo.getSales_price();
+				Long ava_stock = Long.valueOf(salesProd[6].toString());
+				if(ava_stock == 0L){
+					throw new ServiceException("销售品【"+sales_id+"】库存不足");
+				}
+				
+				double sales_price = Double.valueOf(salesProd[4].toString());
+				double mkt_price = Double.valueOf(salesProd[5].toString());
+				
+				order_amount = order_amount + sales_price;
+				pay_amount = pay_amount + sales_price;
 				
 				OrderGoods orderGoods = new OrderGoods();
 				orderGoods.setSales_id(sales_id);
-				orderGoods.setSales_name(goodsSalesInfo.getSales_name());
-				orderGoods.setSales_title(goodsSalesInfo.getSubtitle());
-				orderGoods.setSales_price(goodsSalesInfo.getSales_price());
+				orderGoods.setSales_name(salesProd[2].toString());
+				orderGoods.setProd_name(salesProd[3].toString());
+				orderGoods.setProd_spec(String.valueOf(salesProd[7]));
+				orderGoods.setSales_price(sales_price);
+				orderGoods.setMkt_price(mkt_price);
 				orderGoods.setSales_number(sales_number);
-				orderGoods.setSales_icon(goodsSalesInfo.getSales_img());
+				orderGoods.setSales_icon(salesProd[5].toString());
 				orderGoods.setStatus(1L);
-				orderGoods.setCreate_time(new Date());
+				orderGoods.setCreate_time(current_time);
 				goodsList.add(orderGoods);
+				
+				
+//				GoodsStockOutbound goodsStockOutbound = new GoodsStockOutbound();
+//				goodsStockOutbound.setProduct_id(product_id);
+//				goodsStockOutbound.setOut_type(out_type)
+//				goodsStockOutbound.setOut_stock(sales_number);
+//				goodsStockOutbound.setTotal_stock(total_stock);
+//				goodsStockOutbound.setPre_stock(pre_stock);
+//				goodsStockOutbound.setRel_stock(rel_stock);
+//				goodsStockOutbound.setAva_stock(ava_stock);
+//				goodsStockOutbound.setRemark(remark);
+//				goodsStockOutbound.setValid(valid);
+//				goodsStockOutbound.setModify_time(current_time);
+//				goodsStockOutbound.setCreate_time(current_time);
+//				orderDao.saveObject(obj);
+//				
+//				goods
+//				orderDao.updateObject(obj);
+				
 				
 			}
 			
+			
+			
 			OrderInfo orderInfo = new OrderInfo();
 			orderInfo.setOrder_sort("shufa");
-			orderInfo.setOrder_amount(order_amount);
-			orderInfo.setPay_amount(pay_amount);
 			orderInfo.setOrder_status(1L);
-			orderInfo.setOrder_create_time(new Date());
+			orderInfo.setOrder_amount(order_amount);
+			orderInfo.setPay_type(orderCreateRequest.getPay_type());
+			orderInfo.setPay_amount(pay_amount);
+			orderInfo.setDelivery_mode(delivery.getDelivery_mode());
+			orderInfo.setDelivery_name(delivery.getDelivery_name());
+			orderInfo.setDelivery_phone(delivery.getDelivery_phone());
+			orderInfo.setDelivery_address(delivery.getDelivery_address());
+			orderInfo.setOrder_remark(orderCreateRequest.getOrder_remark());
+			orderInfo.setOrder_create_time(current_time);
 			orderDao.saveObject(orderInfo);
 			orderInfo.setOrder_no(UtilFunction.getOrderNo(orderInfo.getOrder_id()));
 		
@@ -87,13 +135,12 @@ public class OrderService {
 				orderDao.saveObject(good);
 			}
 			
-			
 		} catch (Exception e) {
 			log.logError("订单生成失败",e);
 			throw new ServiceException("订单生成失败："+e.getMessage());
 		}
 		
-		
+		return null;
 	}
 	
 }

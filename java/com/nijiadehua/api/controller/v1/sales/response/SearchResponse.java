@@ -1,19 +1,16 @@
-package com.nijiadehua.api.model;
+package com.nijiadehua.api.controller.v1.sales.response;
 
-import java.io.Serializable;
-public class Sales implements Serializable{
-	
+public class SearchResponse {
+
 	private Long sales_id;
 	private String sort_code;
 	private String sort_short_name;
 	private String sort_long_name;
 	private String sales_name;
 	private String art_name;
-	private String sales_title;
 	private Double sales_price;
 	private Double mkt_price;
 	private String sales_img;
-	
 	public Long getSales_id() {
 		return sales_id;
 	}
@@ -44,11 +41,12 @@ public class Sales implements Serializable{
 	public void setSales_name(String sales_name) {
 		this.sales_name = sales_name;
 	}
-	public String getSales_title() {
-		return sales_title;
+	
+	public String getArt_name() {
+		return art_name;
 	}
-	public void setSales_title(String sales_title) {
-		this.sales_title = sales_title;
+	public void setArt_name(String art_name) {
+		this.art_name = art_name;
 	}
 	public Double getSales_price() {
 		return sales_price;
@@ -68,14 +66,9 @@ public class Sales implements Serializable{
 	public void setSales_img(String sales_img) {
 		this.sales_img = sales_img;
 	}
-	public String getArt_name() {
-		return art_name;
-	}
-	public void setArt_name(String art_name) {
-		this.art_name = art_name;
-	}
 	
 	
 	
 	
+
 }

@@ -28,8 +28,10 @@ public class OrderGoods implements java.io.Serializable {
 	private Long order_id;
 	private Long sales_id;
 	private String sales_name;
-	private String sales_title;
+	private String prod_name;
+	private String prod_spec;
 	private Double sales_price;
+	private Double mkt_price;
 	private Integer sales_number;
 	private String sales_icon;
 	private Long status;
@@ -81,24 +83,44 @@ public class OrderGoods implements java.io.Serializable {
 		this.sales_name = sales_name;
 	}
 	
-	@Column(name = "sales_title")
-	public String getSales_title() {
-		return sales_title;
+	@Column(name = "prod_name")
+	public String getProd_name() {
+		return prod_name;
 	}
 
-	public void setSales_title(String sales_title) {
-		this.sales_title = sales_title;
+	public void setProd_name(String prod_name) {
+		this.prod_name = prod_name;
 	}
 	
+	
+	@Column(name = "prod_spec")
+	public String getProd_spec() {
+		return prod_spec;
+	}
+
+	public void setProd_spec(String prod_spec) {
+		this.prod_spec = prod_spec;
+	}
+
 	@Column(name = "sales_price")
 	public Double getSales_price() {
 		return sales_price;
 	}
 
+
 	public void setSales_price(Double sales_price) {
 		this.sales_price = sales_price;
 	}
 	
+	@Column(name = "mkt_price")
+	public Double getMkt_price() {
+		return mkt_price;
+	}
+
+	public void setMkt_price(Double mkt_price) {
+		this.mkt_price = mkt_price;
+	}
+
 	@Column(name = "sales_number")
 	public Integer getSales_number() {
 		return sales_number;

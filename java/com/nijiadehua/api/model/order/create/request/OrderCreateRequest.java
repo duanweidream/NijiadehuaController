@@ -6,8 +6,9 @@ public class OrderCreateRequest implements Serializable{
 
 	public String user_id;
 	public Sales[] sales;
-	public String pay_type;
+	public Integer pay_type;
 	public Delivery delivery;
+	public String order_remark;
 	public String getUser_id() {
 		return user_id;
 	}
@@ -20,10 +21,10 @@ public class OrderCreateRequest implements Serializable{
 	public void setSales(Sales[] sales) {
 		this.sales = sales;
 	}
-	public String getPay_type() {
+	public Integer getPay_type() {
 		return pay_type;
 	}
-	public void setPay_type(String pay_type) {
+	public void setPay_type(Integer pay_type) {
 		this.pay_type = pay_type;
 	}
 	public Delivery getDelivery() {
@@ -32,6 +33,14 @@ public class OrderCreateRequest implements Serializable{
 	public void setDelivery(Delivery delivery) {
 		this.delivery = delivery;
 	}
+	
+	public String getOrder_remark() {
+		return order_remark;
+	}
+	public void setOrder_remark(String order_remark) {
+		this.order_remark = order_remark;
+	}
+
 
 	public static class Sales{
 		private Long sales_id;

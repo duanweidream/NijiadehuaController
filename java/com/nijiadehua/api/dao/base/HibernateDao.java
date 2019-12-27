@@ -19,15 +19,6 @@ public interface HibernateDao {
 	//update
 	public void updateObject(Object obj);
 	
-	/**
-     * 根据指定的原生SQL和参数 查询 返回对应的java实体
-     * @param sql 原生SQL查询语句
-     * @param params SQL参数数组
-     * @param clazz 实体类
-     * @return List
-     */
-    public List executeNativeSqlQueryForClass(final String sql, final Object[] params, final Class clazz);
-	
 	//find get load search
 	public <T> T get(Serializable id, Class <T> toType);
 	public <T> T load(Serializable id, Class <T> toType);

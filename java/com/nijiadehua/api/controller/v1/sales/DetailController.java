@@ -1,12 +1,15 @@
 package com.nijiadehua.api.controller.v1.sales;
 
+import java.util.List;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+
 import com.nijiadehua.api.base.rest.Result;
+import com.nijiadehua.api.controller.v1.sales.response.DetailResponse;
 import com.nijiadehua.api.exception.ApiError;
-import com.nijiadehua.api.model.Sales;
-import com.nijiadehua.api.service.SalesTest;
+import com.nijiadehua.api.service.SalesService;
 import com.nijiadehua.api.util.StringUtil;
 
 
@@ -19,7 +22,7 @@ import com.nijiadehua.api.util.StringUtil;
  * 
  */
 @Controller
-@RequestMapping(value="/v/1/sales")
+@RequestMapping(value="/v/1/mingjia/sales")
 public class DetailController{
 
 	@ResponseBody
@@ -30,11 +33,14 @@ public class DetailController{
 			return new Result(ApiError.Type.INVALID_PARAM.toException("参数错误!"));
 		}
 		
-		SalesTest salesService = new SalesTest();
-		Sales sales = salesService.findSalesBySalesId(sales_id);
+		SalesService salesService = new SalesService();
+		DetailResponse sales = salesService.findSalesBySalesId(sales_id);
 		if(sales == null){
 			return new Result(ApiError.Type.BUSINESS_ERROR.toException("销售品不存在!"));
 		}
+		
+		List<String> img_array = salesService.findSalesImgBySalesId(sales_id);
+		sales.setSales_img(img_array);
 		
 		return new Result(sales);
 	}

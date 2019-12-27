@@ -66,26 +66,7 @@ public class HibernateDaoImpl extends HibernateDaoSupport implements HibernateDa
 	public Object getObject(Class clazz, Serializable id) {
 		return getHibernateTemplate().get(clazz, id);
 	}
-	
-	
-	/**
-     * 根据指定的原生SQL和参数 查询 返回对应的java实体
-     * @param sql 原生SQL查询语句
-     * @param params SQL参数数组
-     * @param clazz 实体类
-     * @return List
-     */
-    public List executeNativeSqlQueryForClass(final String sql, final Object[] params, final Class clazz) {
-        List list = (List) getHibernateTemplate().execute(new HibernateCallback() {
-            public Object doInHibernate(Session session) throws HibernateException, SQLException {
-                Query query = session.createSQLQuery(sql).addEntity(clazz);
-                return query.list();
-            }
-        });
-        return list;
-    }
-	
-	
+
 	/***/
 	public int update(Statement statement) {
 		Query query = createQuery(false, this.getSession(), statement);
