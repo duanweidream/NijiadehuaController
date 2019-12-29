@@ -32,25 +32,30 @@ public class SearchController{
 	@RequestMapping(value="/search")
 	public Result invokeService(String sort_code,String startIndex,String itemCount) throws ApiError {
 		
-		Integer startIndex1 = NumberUtil.getInteger(startIndex, 0);
-		Integer itemCount1 =  NumberUtil.getInteger(itemCount, 10);
+		try {
+			Integer startIndex1 = NumberUtil.getInteger(startIndex, 0);
+			Integer itemCount1 =  NumberUtil.getInteger(itemCount, 10);
+			
+			Page page = new Page(startIndex1, itemCount1, null);
+			
+			SalesService salesService = new SalesService();
+			
+			salesService.searchSalesForPage(page, sort_code);
+			
+			List<SearchResponse> listTrip = (List<SearchResponse>)page.getList();
+			
+			JSONObject data = new JSONObject();
+			data.put("list", listTrip);
+			data.put("itemCount", page.itemCount);
+			data.put("totalCount", page.totalCount);
+			data.put("startIndex", page.startIndex);
+			data.put("currentPage",page.currentPage);
+			data.put("totalPage", page.totalPage);
+			return new Result(data);
+		}catch (Exception e) {
+			throw ApiError.Type.BUSINESS_ERROR.toException("名家销售品列表查询失败："+e.getMessage());
+		}
 		
-		Page page = new Page(startIndex1, itemCount1, null);
-		
-		SalesService salesService = new SalesService();
-		
-		salesService.searchSalesForPage(page, sort_code);
-		
-		List<SearchResponse> listTrip = (List<SearchResponse>)page.getList();
-		
-		JSONObject data = new JSONObject();
-		data.put("list", listTrip);
-		data.put("itemCount", page.itemCount);
-        data.put("totalCount", page.totalCount);
-        data.put("startIndex", page.startIndex);
-        data.put("currentPage",page.currentPage);
-        data.put("totalPage", page.totalPage);
-		return new Result(data);
 	}
 
 

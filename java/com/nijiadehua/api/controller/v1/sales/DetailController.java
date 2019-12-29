@@ -28,21 +28,24 @@ public class DetailController{
 	@ResponseBody
 	@RequestMapping(value="/detail")
 	public Result invokeService(String sales_id) throws ApiError {
-		
-		if(StringUtil.isEmpty(sales_id)){
-			return new Result(ApiError.Type.INVALID_PARAM.toException("参数错误!"));
+		try {
+			if(StringUtil.isEmpty(sales_id)){
+				return new Result(ApiError.Type.INVALID_PARAM.toException("参数错误!"));
+			}
+			
+			SalesService salesService = new SalesService();
+			DetailResponse sales = salesService.findSalesBySalesId(sales_id);
+			if(sales == null){
+				return new Result(ApiError.Type.BUSINESS_ERROR.toException("销售品不存在!"));
+			}
+			
+			List<String> img_array = salesService.findSalesImgBySalesId(sales_id);
+			sales.setSales_img(img_array);
+			
+			return new Result(sales);
+		}catch (Exception e) {
+			throw ApiError.Type.BUSINESS_ERROR.toException("名家销售品详情查询失败："+e.getMessage());
 		}
-		
-		SalesService salesService = new SalesService();
-		DetailResponse sales = salesService.findSalesBySalesId(sales_id);
-		if(sales == null){
-			return new Result(ApiError.Type.BUSINESS_ERROR.toException("销售品不存在!"));
-		}
-		
-		List<String> img_array = salesService.findSalesImgBySalesId(sales_id);
-		sales.setSales_img(img_array);
-		
-		return new Result(sales);
 	}
 
 

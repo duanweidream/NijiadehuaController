@@ -37,4 +37,21 @@ public class HomeService {
 		return jdbcTemplate.queryForList(sql,HomeListResponse.class);
 	}
 	
+	
+	
+	
+	public static void main(String[] args) throws ApiError {
+		JdbcTemplate jdbcTemplate = new JdbcTemplate();
+		String contents = "【珠海预警中心】【横琴马拉松天气】预计赛区上午阴天有阵雨，有时雨势较大，气温16到19℃，东北风4到5级阵风6级，体感清凉，请做好应对措施。珠海市气象台12月29日6时10分发布.\r\n" + 
+				"[Weather Report]Mainly cloudy with shower this morning, shower will be frequent occasionally. The temperature is at 16 to 19 degrees. And force 4 to 6 northeasterly winds.";
+		Sql sql = new Sql(" insert into kiss_test (contents) values (?) ");
+		sql.addParam(contents);
+		jdbcTemplate.saveObject(sql);
+	}
+	
+	
+	
+	
+	
+	
 }

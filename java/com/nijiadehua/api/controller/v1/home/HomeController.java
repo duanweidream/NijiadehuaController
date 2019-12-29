@@ -27,7 +27,7 @@ public class HomeController{
 			return new Result(salesList);
 		}catch (Exception e) {
 			e.printStackTrace();
-			throw ApiError.Type.BUSINESS_ERROR.toException("查询首页位置数据失败");
+			throw ApiError.Type.BUSINESS_ERROR.toException("查询首页位置数据查询失败："+e.getMessage());
 		}
 	}
 	
@@ -42,7 +42,7 @@ public class HomeController{
 			return new Result(salesList);
 		}catch (Exception e) {
 			e.printStackTrace();
-			throw ApiError.Type.BUSINESS_ERROR.toException("首页分类数据失败");
+			throw ApiError.Type.BUSINESS_ERROR.toException("首页分类数据查询失败："+e.getMessage());
 		}
 	}
 	

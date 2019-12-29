@@ -21,7 +21,7 @@ import com.nijiadehua.api.util.StringUtil;
  * 
  */
 @Controller
-@RequestMapping(value="/v/1/order")
+@RequestMapping(value="/v/1/mingjia/order")
 public class CreateController{
 	
 	@Autowired

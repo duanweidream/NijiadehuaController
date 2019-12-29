@@ -47,7 +47,7 @@
         <property name="maxActive" value="${jdbc.maxActive}"/>
         <property name="maxIdle" value="${jdbc.maxIdle}"/>
         <property name="minIdle" value="${jdbc.minIdle}"/>
-        <!-- <property name="defaultAutoCommit" value="false"/>  -->
+        <property name="defaultAutoCommit" value="false"/>
         <property name="removeAbandoned" value="true"/>
         <property name="removeAbandonedTimeout" value="${jdbc.removeAbandonedTimeout}"/>
     </bean>
