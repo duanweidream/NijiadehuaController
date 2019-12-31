@@ -22,7 +22,7 @@ import com.nijiadehua.api.util.StringUtil;
  */
 @Controller
 @RequestMapping(value="/v/1/mingjia/order")
-public class CreateController{
+public class MingjiaOrderController{
 	
 	@Autowired
 	OrderService orderService;
@@ -32,7 +32,7 @@ public class CreateController{
 	public Result create(@RequestBody String json) throws ServiceException{
 		
 		if(StringUtil.isEmpty(json)){
-			return new Result(ApiError.Type.INVALID_PARAM.toException("参数错误!"));
+			return new Result(ApiError.Type.BUSINESS_ERROR.toException("参数错误!"));
 		}
 		
 		try{
@@ -43,7 +43,6 @@ public class CreateController{
 		}catch (Exception e) {
 			return new Result(ApiError.Type.BUSINESS_ERROR.toException(e.getMessage()));
 		}
-		
 		
 	}
 	

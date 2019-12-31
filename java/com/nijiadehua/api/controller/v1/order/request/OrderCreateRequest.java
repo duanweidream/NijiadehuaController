@@ -1,4 +1,4 @@
-package com.nijiadehua.api.controller.v1.order;
+package com.nijiadehua.api.controller.v1.order.request;
 
 import java.io.Serializable;
 

@@ -56,8 +56,9 @@ public class ApiError extends Exception{
     }
     
     public static enum Type {
+    	
+    	BUSINESS_ERROR(1, "业务错误"),
     	NO_SUCH_SERVICE(1000, "没有对应的服务"),
-    	BUSINESS_ERROR(1111, "业务错误"),
         INTERNAL_ERROR(1001, "内部错误"),
         NOT_LOGGED_IN(2001, "尚未登录"), 
         INVALID_PARAM(3001, "参数错误");
