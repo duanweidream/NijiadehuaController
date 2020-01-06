@@ -3,7 +3,9 @@ package com.nijiadehua.api.controller.v1.sales;
 import java.util.List;
 
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.nijiadehua.api.base.rest.Result;
@@ -33,7 +35,7 @@ import net.sf.json.JSONObject;
 public class MingjiaSalesController {
 
 	@ResponseBody
-	@RequestMapping(value="/search")
+	@RequestMapping(value="/search",method=RequestMethod.GET)
 	public Result search(String sort_code,String startIndex,String itemCount) throws Exception {
 		
 		try {
@@ -63,11 +65,11 @@ public class MingjiaSalesController {
 	}
 	
 	@ResponseBody
-	@RequestMapping(value="/detail")
-	public Result detail(String sales_id) throws ApiError {
+	@RequestMapping(value="/detail",method=RequestMethod.GET)
+	public Result detail(String sales_id) throws Exception {
 		try {
 			if(StringUtil.isEmpty(sales_id)){
-				return new Result(ApiError.Type.BUSINESS_ERROR.toException("参数错误!"));
+				return new Result(ApiError.Type.INVALID_PARAM.toException("参数错误!"));
 			}
 			
 			SalesService salesService = new SalesService();
@@ -87,11 +89,11 @@ public class MingjiaSalesController {
 
 
 	@ResponseBody
-	@RequestMapping(value="/attr")
-	public Result attr(String sales_id){
+	@RequestMapping(value="/attr",method=RequestMethod.GET)
+	public Result attr(String sales_id) throws Exception{
 		try {
 			if(StringUtil.isEmpty(sales_id)){
-				return new Result(ApiError.Type.BUSINESS_ERROR.toException("参数错误!"));
+				return new Result(ApiError.Type.INVALID_PARAM.toException("参数错误!"));
 			}
 			
 			SalesService salesService = new SalesService();
@@ -107,23 +109,30 @@ public class MingjiaSalesController {
 	}
 	
 	@ResponseBody
-	@RequestMapping(value="/stock")
-	public Result stock(String sales_id,String value_id) throws ApiError {
+	@RequestMapping(value="/stock",method=RequestMethod.POST)
+	public Result stock(@RequestBody String json) throws Exception {
+		
 		try {
-			if(StringUtil.isEmpty(sales_id)){
+			
+			
+			if(StringUtil.isEmpty(json)){
 				return new Result(ApiError.Type.INVALID_PARAM.toException("参数错误!"));
 			}
 			
-			SalesService salesService = new SalesService();
+			JSONObject request = JSONObject.fromObject(json);
+			String sales_id = request.getString("sales_id");
+			String value_id = request.getString("value_id");
 			
-			String new_sku_code = CryptoUtil.encryptData("16"+"&"+value_id);
-			
-			DetailResponse sales = salesService.findSalesBySalesId(sales_id);
-			if(sales == null){
-				return new Result(ApiError.Type.BUSINESS_ERROR.toException("销售品不存在!"));
+			if(StringUtil.isEmpty(sales_id,value_id)){
+				return new Result(ApiError.Type.INVALID_PARAM.toException("参数错误!"));
 			}
 			
-			return new Result(sales);
+			
+			SalesService salesService = new SalesService();
+			
+			int stock = salesService.findSalesStockBySalesId(sales_id,value_id);
+			
+			return new Result(stock);
 		}catch (Exception e) {
 			return new Result(ApiError.Type.BUSINESS_ERROR.toException(e.getMessage()));
 		}

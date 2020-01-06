@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import com.nijiadehua.api.base.rest.Result;
 import com.nijiadehua.api.controller.v1.home.response.HomeFocusResponse;
@@ -17,7 +18,7 @@ import com.nijiadehua.api.service.HomeService;
 public class HomeController{
 
 	@ResponseBody
-	@RequestMapping(value="/home/focus")
+	@RequestMapping(value="/home/focus",method=RequestMethod.GET)
 	public Result homeFocus() throws Exception {
 		
 		try{
@@ -32,7 +33,7 @@ public class HomeController{
 	}
 	
 	@ResponseBody
-	@RequestMapping(value="/home/list")
+	@RequestMapping(value="/home/list",method=RequestMethod.GET)
 	public Result homeList() throws Exception {
 		
 		try{

@@ -3,6 +3,7 @@ package com.nijiadehua.api.controller.v1.login;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.nijiadehua.api.base.rest.Result;
@@ -25,7 +26,7 @@ import com.nijiadehua.api.service.LoginService;
 public class LoginController {
 
 	@ResponseBody
-	@RequestMapping(value = "/login")
+	@RequestMapping(value = "/login",method=RequestMethod.POST)
 	public Result login(@RequestBody String json) throws ServiceException {
 
 		try {

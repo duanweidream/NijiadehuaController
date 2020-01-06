@@ -96,33 +96,17 @@ public class SalesService {
 		
 	}
 	
-	public List<SalesAttrResponse> findSalesStockBySalesId(String sales_id) throws ServiceException{
+	public int findSalesStockBySalesId(String sales_id,String value_id) throws ServiceException{
 		try {
-			Sql sql = new Sql(" SELECT c.attr_id,c.attr_name ");
-			sql.append(" FROM art_sales_info a,art_prod_info b,art_attribute c  ");
-			sql.append(" where a.product_id = b.product_id and b.sort_id = c.attr_sort and a.sales_id = ? ");
-			sql.addParam(sales_id);
-			List<SalesAttrResponse> attrList = jdbcTemplate.queryForList(sql,SalesAttrResponse.class);
-			if(attrList == null || attrList.size() == 0) {
-				throw new ServiceException("查询销售品SKU属性错误");
-			}
 			
-			for(SalesAttrResponse attr : attrList) {
-				
-				Sql valueSql = new Sql(" SELECT id value_id,attr_value value_name from art_attribute_value where attr_id = ? ");
-				valueSql.addParam(attr.getAttr_id());
-				
-				List<SalesValueResponse> valueList = jdbcTemplate.queryForList(valueSql,SalesValueResponse.class);
-				if(valueList == null || valueList.size() == 0) {
-					throw new ServiceException("查询销售品SKU属性值错误");
-				}
-				attr.setValues(valueList);
-				
-			}
+			Sql sql = new Sql(" select ifnull(sum(c.sku_stock),0) as stock from art_sales_info a,art_prod_info b,art_prod_sku c,art_prod_sku_item d ");
+			sql.append(" where a.product_id = b.product_id and b.product_id = c.product_id and c.sku_id = d.sku_id and a.sales_id = ? and d.attr_value_id = ?  ");
+			sql.addParam(sales_id,value_id);
+			int result = jdbcTemplate.findInteger(sql);
 			
-			return attrList;
+			return result;
 		}catch (Exception e) {
-			throw new ServiceException("查询销售品SKU属性错误："+e.getMessage());
+			throw new ServiceException("查询销售品库存错误："+e.getMessage());
 		}
 		
 	}
