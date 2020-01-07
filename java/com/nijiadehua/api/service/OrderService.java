@@ -6,16 +6,24 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import com.nijiadehua.api.base.db.JdbcTemplate;
+import com.nijiadehua.api.base.db.Sql;
 import com.nijiadehua.api.base.log.Logger;
 import com.nijiadehua.api.controller.v1.order.request.OrderCreateRequest;
 import com.nijiadehua.api.controller.v1.order.request.OrderCreateRequest.Delivery;
 import com.nijiadehua.api.controller.v1.order.request.OrderCreateRequest.Sales;
 import com.nijiadehua.api.controller.v1.order.response.OrderCreateResponse;
+import com.nijiadehua.api.controller.v1.order.response.OrderSearchResponse;
+import com.nijiadehua.api.controller.v1.order.response.OrderSearchResponse.Goods;
+import com.nijiadehua.api.controller.v1.sales.response.SearchResponse;
 import com.nijiadehua.api.dao.OrderDao;
+import com.nijiadehua.api.exception.ApiError;
 import com.nijiadehua.api.exception.ServiceException;
 import com.nijiadehua.api.model.GoodsStockOutbound;
 import com.nijiadehua.api.model.OrderGoods;
 import com.nijiadehua.api.model.OrderInfo;
+import com.nijiadehua.api.model.Page;
 import com.nijiadehua.api.util.JsonUtil;
 import com.nijiadehua.api.util.UtilFunction;
 
@@ -30,6 +38,8 @@ import com.nijiadehua.api.util.UtilFunction;
  */
 @Service
 public class OrderService {
+	
+	private JdbcTemplate jdbcTemplate = new JdbcTemplate();
 	
 	private static Logger log = Logger.getLogger(OrderService.class);
 	
@@ -144,7 +154,30 @@ public class OrderService {
 	}
 	
 	
+	public void searchOrderForPage(Page page,String user_id,String status) throws ServiceException{
+		try {
+			Sql sql = new Sql(" select user_id,order_id,order_no,order_status,order_amount,pay_amount,create_time from art_order_info  ");
+			
+			sql.append(" order by create_time desc ");
+			jdbcTemplate.search(page, sql,OrderSearchResponse.class);
+			
 	
+			List<OrderSearchResponse> listTrip = (List<OrderSearchResponse>)page.getList();
+			for(OrderSearchResponse order : listTrip) {
+				Sql goods = new Sql(" select sales_id,sales_name,title,value_id,value_name,sales_price,mkt_price,qty,sales_icon from art_order_goods where order_id = ?  ");
+				goods.addParam(order.getOrder_id());
+				List<Goods> goodsList = jdbcTemplate.queryForList(goods,Goods.class);
+				order.setGoods(goodsList);
+			}
+			
+			
+			page.setList(listTrip);
+			
+		}catch(Exception e) {
+			log.logError("订单列表分页查询错误", e);
+			throw new ServiceException("订单列表分页查询错误："+e.getMessage());
+		}
+	}
 		
 	
 	

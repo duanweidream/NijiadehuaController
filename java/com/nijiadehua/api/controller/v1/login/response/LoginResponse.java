@@ -7,7 +7,6 @@ public class LoginResponse {
 	private String wx_img;
 	private String wx_sex;
 	private String open_id;
-	private String unionid;
 	private String phone;
 	
 	
@@ -42,12 +41,7 @@ public class LoginResponse {
 	public void setOpen_id(String open_id) {
 		this.open_id = open_id;
 	}
-	public String getUnionid() {
-		return unionid;
-	}
-	public void setUnionid(String unionid) {
-		this.unionid = unionid;
-	}
+	
 	public String getPhone() {
 		return phone;
 	}

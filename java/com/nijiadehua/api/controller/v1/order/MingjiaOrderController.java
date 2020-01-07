@@ -1,5 +1,7 @@
 package com.nijiadehua.api.controller.v1.order;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -8,10 +10,15 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.nijiadehua.api.base.rest.Result;
+import com.nijiadehua.api.controller.v1.order.response.OrderSearchResponse;
 import com.nijiadehua.api.exception.ApiError;
 import com.nijiadehua.api.exception.ServiceException;
+import com.nijiadehua.api.model.Page;
 import com.nijiadehua.api.service.OrderService;
+import com.nijiadehua.api.util.NumberUtil;
 import com.nijiadehua.api.util.StringUtil;
+
+import net.sf.json.JSONObject;
 
 /**
  * ClassName:Create</br> Function: 订单生成 </br>
@@ -49,18 +56,33 @@ public class MingjiaOrderController{
 	
 	
 	@ResponseBody
-	@RequestMapping(value="/list",method=RequestMethod.GET)
-	public Result list(@RequestBody String json) throws ServiceException{
+	@RequestMapping(value="/search",method=RequestMethod.GET)
+	public Result search(String user_id,String status,String startIndex,String itemCount) throws Exception {
 		
-		if(StringUtil.isEmpty(json)){
-			return new Result(ApiError.Type.INVALID_PARAM.toException("参数错误!"));
-		}
-		
-		try{
+		try {
 			
-			//orderService.createOrder(json);
+			if(StringUtil.isEmpty(user_id)){
+				return new Result(ApiError.Type.INVALID_PARAM.toException("参数错误!"));
+			}
 			
-			return new Result();
+			Integer startIndex1 = NumberUtil.getInteger(startIndex, 0);
+			Integer itemCount1 =  NumberUtil.getInteger(itemCount, 10);
+			
+			Page page = new Page(startIndex1, itemCount1, null);
+			
+			
+			orderService.searchOrderForPage(page,user_id,status);
+			
+			List<OrderSearchResponse> listTrip = (List<OrderSearchResponse>)page.getList();
+			
+			JSONObject data = new JSONObject();
+			data.put("list", listTrip);
+			data.put("itemCount", page.itemCount);
+			data.put("totalCount", page.totalCount);
+			data.put("startIndex", page.startIndex);
+			data.put("currentPage",page.currentPage);
+			data.put("totalPage", page.totalPage);
+			return new Result(data);
 		}catch (Exception e) {
 			return new Result(ApiError.Type.BUSINESS_ERROR.toException(e.getMessage()));
 		}
@@ -69,9 +91,9 @@ public class MingjiaOrderController{
 	
 	@ResponseBody
 	@RequestMapping(value="/detail",method=RequestMethod.GET)
-	public Result detail(@RequestBody String json) throws ServiceException{
+	public Result detail(String user_id,String order_id) throws ServiceException{
 		
-		if(StringUtil.isEmpty(json)){
+		if(StringUtil.isEmpty(user_id,order_id)){
 			return new Result(ApiError.Type.INVALID_PARAM.toException("参数错误!"));
 		}
 		
