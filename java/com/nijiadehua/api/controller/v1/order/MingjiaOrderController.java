@@ -55,6 +55,24 @@ public class MingjiaOrderController{
 		
 	}
 	
+	@ResponseBody
+	@RequestMapping(value="/submit",method=RequestMethod.POST)
+	public Result submit(@RequestBody String json) throws ServiceException{
+		
+		if(StringUtil.isEmpty(json)){
+			return new Result(ApiError.Type.INVALID_PARAM.toException("参数错误!"));
+		}
+		
+		try{
+			
+			orderService.createOrder(json);
+			
+			return new Result();
+		}catch (Exception e) {
+			return new Result(ApiError.Type.BUSINESS_ERROR.toException(e.getMessage()));
+		}
+		
+	}
 	
 	@ResponseBody
 	@RequestMapping(value="/search",method=RequestMethod.GET)
