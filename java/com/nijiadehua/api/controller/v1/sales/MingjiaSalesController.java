@@ -59,7 +59,7 @@ public class MingjiaSalesController {
 			data.put("totalPage", page.totalPage);
 			return new Result(data);
 		}catch (Exception e) {
-			throw ApiError.Type.BUSINESS_ERROR.toException(e.getMessage());
+			return new Result(ApiError.Type.BUSINESS_ERROR.toException(e.getMessage()));
 		}
 		
 	}
@@ -83,7 +83,7 @@ public class MingjiaSalesController {
 			
 			return new Result(sales);
 		}catch (Exception e) {
-			throw ApiError.Type.BUSINESS_ERROR.toException(e.getMessage());
+			return new Result(ApiError.Type.BUSINESS_ERROR.toException(e.getMessage()));
 		}
 	}
 

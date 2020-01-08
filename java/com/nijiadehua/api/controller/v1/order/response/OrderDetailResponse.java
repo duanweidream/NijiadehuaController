@@ -1,12 +1,9 @@
 package com.nijiadehua.api.controller.v1.order.response;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
-import com.nijiadehua.api.model.OrderGoods;
-
-public class OrderSearchResponse {
+public class OrderDetailResponse {
 	
 	private String user_id;
 	private Long order_id;
@@ -17,6 +14,14 @@ public class OrderSearchResponse {
 	private String order_remark;
 	private String create_time;
 	private List<Goods> goods = new ArrayList<Goods>();
+	private int delivery_mode;
+	private String delivery_name;
+	private String delivery_phone;
+	private String delivery_address;
+	private int delivery_send;
+	private String express_company;
+	private String express_number;
+	private String express_freight;
 	
 	
 	public String getUser_id() {
@@ -102,6 +107,18 @@ public class OrderSearchResponse {
 		this.goods = goods;
 	}
 
+
+
+	public String getCreate_time() {
+		return create_time;
+	}
+
+
+
+	public void setCreate_time(String create_time) {
+		this.create_time = create_time;
+	}
+	
 	
 
 
@@ -117,15 +134,100 @@ public class OrderSearchResponse {
 
 
 
-	public String getCreate_time() {
-		return create_time;
+	public int getDelivery_mode() {
+		return delivery_mode;
 	}
 
 
 
-	public void setCreate_time(String create_time) {
-		this.create_time = create_time;
+	public void setDelivery_mode(int delivery_mode) {
+		this.delivery_mode = delivery_mode;
 	}
+
+
+
+	public String getDelivery_name() {
+		return delivery_name;
+	}
+
+
+
+	public void setDelivery_name(String delivery_name) {
+		this.delivery_name = delivery_name;
+	}
+
+
+
+	public String getDelivery_phone() {
+		return delivery_phone;
+	}
+
+
+
+	public void setDelivery_phone(String delivery_phone) {
+		this.delivery_phone = delivery_phone;
+	}
+
+
+
+	public String getDelivery_address() {
+		return delivery_address;
+	}
+
+
+
+	public void setDelivery_address(String delivery_address) {
+		this.delivery_address = delivery_address;
+	}
+
+
+
+	public int getDelivery_send() {
+		return delivery_send;
+	}
+
+
+
+	public void setDelivery_send(int delivery_send) {
+		this.delivery_send = delivery_send;
+	}
+
+
+
+	public String getExpress_company() {
+		return express_company;
+	}
+
+
+
+	public void setExpress_company(String express_company) {
+		this.express_company = express_company;
+	}
+
+
+
+	public String getExpress_number() {
+		return express_number;
+	}
+
+
+
+	public void setExpress_number(String express_number) {
+		this.express_number = express_number;
+	}
+
+
+
+	public String getExpress_freight() {
+		return express_freight;
+	}
+
+
+
+	public void setExpress_freight(String express_freight) {
+		this.express_freight = express_freight;
+	}
+
 
 
 
@@ -195,7 +297,7 @@ public class OrderSearchResponse {
 			this.sales_icon = sales_icon;
 		}
 		
+		
 	}
-	
-	
+
 }

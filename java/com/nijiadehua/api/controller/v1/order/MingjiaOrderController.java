@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.nijiadehua.api.base.rest.Result;
+import com.nijiadehua.api.controller.v1.order.response.OrderDetailResponse;
 import com.nijiadehua.api.controller.v1.order.response.OrderSearchResponse;
 import com.nijiadehua.api.exception.ApiError;
 import com.nijiadehua.api.exception.ServiceException;
@@ -99,9 +100,9 @@ public class MingjiaOrderController{
 		
 		try{
 			
-			//orderService.createOrder(json);
+			OrderDetailResponse orderDetailResponse = orderService.queryOrderDetailByOrderId(user_id, order_id);
 			
-			return new Result();
+			return new Result(orderDetailResponse);
 		}catch (Exception e) {
 			return new Result(ApiError.Type.BUSINESS_ERROR.toException(e.getMessage()));
 		}
@@ -111,9 +112,9 @@ public class MingjiaOrderController{
 	
 	@ResponseBody
 	@RequestMapping(value="/cancel",method=RequestMethod.GET)
-	public Result cancel(String order_no) throws ServiceException{
+	public Result cancel(String user_id,String order_id) throws ServiceException{
 		
-		if(StringUtil.isEmpty(order_no)){
+		if(StringUtil.isEmpty(user_id,order_id)){
 			return new Result(ApiError.Type.INVALID_PARAM.toException("参数错误!"));
 		}
 		

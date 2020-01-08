@@ -58,8 +58,14 @@ public class WeChatApi {
 	
 	public static void main(String[] args) throws ApiError {
 		
-		JSONObject json = getOpenIdByCode("123");
-		
+		JSONObject json = new JSONObject();
+		//json.put("code", 1);
+		//json.put("openid", "3");
+		if(json.has("openid")) {
+			System.out.println(json.getString("openid"));
+		}else {
+			System.out.println(json.getInt("code"));
+		}
 		
 	}
 	

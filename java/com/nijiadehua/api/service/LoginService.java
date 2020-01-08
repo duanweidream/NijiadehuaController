@@ -33,11 +33,14 @@ public class LoginService {
 			
 			
 			JSONObject authInfo = WeChatApi.getOpenIdByCode(loginRequest.getCode());
-			int errcode = authInfo.getInt("errcode");
-			String errmsg = authInfo.getString("errmsg");
-			
-			if(errcode != 0) {
-				throw new ServiceException("调用微信接口错误："+errmsg);
+			if(!authInfo.has("openid")) {
+				int errcode = authInfo.getInt("errcode");
+				String errmsg = authInfo.getString("errmsg");
+				
+				if(errcode != 0) {
+					throw new ServiceException("调用微信接口错误："+errmsg);
+				}
+				
 			}
 			String openid = authInfo.getString("openid");
 			
@@ -45,7 +48,7 @@ public class LoginService {
 			Sql sql = new Sql("insert into art_user_info (`wx_name`,`wx_img`,`wx_sex`,`open_id`,`phone`,`identity`,`login_count`,`create_time`,`first_login_time`,`last_login_time`)");
 			sql.append("values (?,?,?,?,?,?,?,?,?,?) ");
 			sql.append("on duplicate key update `wx_name`=?,`wx_img`=?,`wx_sex`=?,`phone`=?,`login_count`=`login_count`+1,`last_login_time`=?");
-			sql.addParam(loginRequest.getUser().getWx_name(),loginRequest.getUser().getWx_img(),loginRequest.getUser().getWx_sex(),openid,loginRequest.getUser().getPhone(),1,0,currentTime,currentTime,currentTime);
+			sql.addParam(loginRequest.getUser().getWx_name(),loginRequest.getUser().getWx_img(),loginRequest.getUser().getWx_sex(),openid,loginRequest.getUser().getPhone(),1,1,currentTime,currentTime,currentTime);
 			sql.addParam(loginRequest.getUser().getWx_name(),loginRequest.getUser().getWx_img(),loginRequest.getUser().getWx_sex(),loginRequest.getUser().getPhone(),currentTime);
 			int result = jdbcTemplate.updateObject(sql);
 			if(result == 0) {
@@ -67,6 +70,13 @@ public class LoginService {
 		}
 		
 	}
+	
+	
+	public static void main(String[] args) {
+		
+		
+	}
+	
 	
 	
 }

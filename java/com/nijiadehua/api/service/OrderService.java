@@ -14,6 +14,7 @@ import com.nijiadehua.api.controller.v1.order.request.OrderCreateRequest;
 import com.nijiadehua.api.controller.v1.order.request.OrderCreateRequest.Delivery;
 import com.nijiadehua.api.controller.v1.order.request.OrderCreateRequest.Sales;
 import com.nijiadehua.api.controller.v1.order.response.OrderCreateResponse;
+import com.nijiadehua.api.controller.v1.order.response.OrderDetailResponse;
 import com.nijiadehua.api.controller.v1.order.response.OrderSearchResponse;
 import com.nijiadehua.api.controller.v1.order.response.OrderSearchResponse.Goods;
 import com.nijiadehua.api.controller.v1.sales.response.SearchResponse;
@@ -25,6 +26,7 @@ import com.nijiadehua.api.model.OrderGoods;
 import com.nijiadehua.api.model.OrderInfo;
 import com.nijiadehua.api.model.Page;
 import com.nijiadehua.api.util.JsonUtil;
+import com.nijiadehua.api.util.StringUtil;
 import com.nijiadehua.api.util.UtilFunction;
 
 
@@ -156,7 +158,11 @@ public class OrderService {
 	
 	public void searchOrderForPage(Page page,String user_id,String status) throws ServiceException{
 		try {
-			Sql sql = new Sql(" select user_id,order_id,order_no,order_status,order_amount,pay_amount,create_time from art_order_info  ");
+			Sql sql = new Sql(" select user_id,order_id,order_no,order_status,order_amount,pay_amount,order_remark,create_time from art_order_info where order_status <> 9 ");
+			sql.append("and", "user_id", "=", user_id);
+			if(!StringUtil.isEmpty(status)){
+				sql.append("and", "order_status", "=", status);
+			}
 			
 			sql.append(" order by create_time desc ");
 			jdbcTemplate.search(page, sql,OrderSearchResponse.class);
@@ -164,7 +170,7 @@ public class OrderService {
 	
 			List<OrderSearchResponse> listTrip = (List<OrderSearchResponse>)page.getList();
 			for(OrderSearchResponse order : listTrip) {
-				Sql goods = new Sql(" select sales_id,sales_name,title,value_id,value_name,sales_price,mkt_price,qty,sales_icon from art_order_goods where order_id = ?  ");
+				Sql goods = new Sql(" select sales_id,sales_name,title,sku_id,sku_name,sales_price,mkt_price,qty,sales_icon from art_order_goods where order_id = ?  ");
 				goods.addParam(order.getOrder_id());
 				List<Goods> goodsList = jdbcTemplate.queryForList(goods,Goods.class);
 				order.setGoods(goodsList);
@@ -179,6 +185,24 @@ public class OrderService {
 		}
 	}
 		
-	
+	public OrderDetailResponse queryOrderDetailByOrderId(String user_id,String order_id) throws ServiceException{
+		try {
+			Sql sql = new Sql(" select user_id,order_id,order_no,order_status,order_amount,pay_amount,order_remark,create_time,delivery_mode,delivery_name,delivery_phone,delivery_address,delivery_send,express_company,express_number,express_freight from art_order_info where order_id = ? and user_id = ? ");
+			sql.addParam(order_id,user_id);
+			
+			OrderDetailResponse order = jdbcTemplate.findObject(sql, OrderDetailResponse.class);
+			
+			Sql goods = new Sql(" select sales_id,sales_name,title,sku_id,sku_name,sales_price,mkt_price,qty,sales_icon from art_order_goods where order_id = ?  ");
+			goods.addParam(order.getOrder_id());
+			List<com.nijiadehua.api.controller.v1.order.response.OrderDetailResponse.Goods> goodsList = jdbcTemplate.queryForList(goods,com.nijiadehua.api.controller.v1.order.response.OrderDetailResponse.Goods.class);
+			order.setGoods(goodsList);
+			
+			
+			return order;
+		}catch(Exception e) {
+			log.logError("订单详情查询错误", e);
+			throw new ServiceException("订单详情查询错误："+e.getMessage());
+		}
+	}
 	
 }
