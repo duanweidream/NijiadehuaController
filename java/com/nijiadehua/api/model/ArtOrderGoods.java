@@ -25,6 +25,7 @@ public class ArtOrderGoods implements java.io.Serializable {
 	 */
 	private static final long serialVersionUID = 1L;
 	private Long id;
+	private Long user_id;
 	private String order_id;
 	private Long sales_id;
 	private String sales_name;
@@ -55,6 +56,16 @@ public class ArtOrderGoods implements java.io.Serializable {
 
 	public void setId(Long id) {
 		this.id = id;
+	}
+	
+	
+	@Column(name = "user_id")
+	public Long getUser_id() {
+		return user_id;
+	}
+
+	public void setUser_id(Long user_id) {
+		this.user_id = user_id;
 	}
 
 	@Column(name = "order_id")

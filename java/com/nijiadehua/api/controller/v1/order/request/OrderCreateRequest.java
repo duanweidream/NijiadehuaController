@@ -6,15 +6,15 @@ import java.util.ArrayList;
 
 public class OrderCreateRequest implements Serializable{
 
-	public String user_id;
+	public Long user_id;
 	public List<Sales> sales = new ArrayList<Sales>();
 	
 
-	public String getUser_id() {
+	public Long getUser_id() {
 		return user_id;
 	}
 
-	public void setUser_id(String user_id) {
+	public void setUser_id(Long user_id) {
 		this.user_id = user_id;
 	}
 

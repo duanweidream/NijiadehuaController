@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.nijiadehua.api.base.rest.Result;
+import com.nijiadehua.api.controller.v1.order.response.OrderCreateResponse;
 import com.nijiadehua.api.controller.v1.order.response.OrderDetailResponse;
 import com.nijiadehua.api.controller.v1.order.response.OrderSearchResponse;
 import com.nijiadehua.api.exception.ApiError;
@@ -46,9 +47,9 @@ public class MingjiaOrderController{
 		
 		try{
 			
-			orderService.createOrder(json);
+			OrderCreateResponse orderCreateResponse = orderService.createOrder(json);
 			
-			return new Result();
+			return new Result(orderCreateResponse);
 		}catch (Exception e) {
 			return new Result(ApiError.Type.BUSINESS_ERROR.toException(e.getMessage()));
 		}
@@ -65,7 +66,7 @@ public class MingjiaOrderController{
 		
 		try{
 			
-			orderService.createOrder(json);
+			orderService.submitOrder(json);
 			
 			return new Result();
 		}catch (Exception e) {

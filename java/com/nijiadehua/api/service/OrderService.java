@@ -16,13 +16,16 @@ import com.nijiadehua.api.controller.v1.order.request.OrderCreateRequest.Sales;
 import com.nijiadehua.api.controller.v1.order.response.OrderCreateResponse;
 import com.nijiadehua.api.controller.v1.order.response.OrderDetailResponse;
 import com.nijiadehua.api.controller.v1.order.response.OrderSearchResponse;
+import com.nijiadehua.api.controller.v1.order.response.OrderCreateResponse.OrderGoods;
 import com.nijiadehua.api.controller.v1.order.response.OrderSearchResponse.Goods;
 import com.nijiadehua.api.dao.OrderDao;
 import com.nijiadehua.api.exception.ServiceException;
 import com.nijiadehua.api.model.ArtOrderGoods;
 import com.nijiadehua.api.model.ArtSalesInfo;
 import com.nijiadehua.api.model.Page;
+import com.nijiadehua.api.util.CryptoUtil;
 import com.nijiadehua.api.util.JsonUtil;
+import com.nijiadehua.api.util.NumberUtil;
 import com.nijiadehua.api.util.OrderId;
 import com.nijiadehua.api.util.StringUtil;
 
@@ -46,6 +49,7 @@ public class OrderService {
 	private OrderDao orderDao;
 
 	public OrderCreateResponse createOrder(String json) throws ServiceException{
+		OrderCreateResponse orderCreateResponse = new OrderCreateResponse();
 		try {
 			
 			log.logInfo("json:"+json);
@@ -77,25 +81,36 @@ public class OrderService {
 				int sales_number = sa.getQty();
 				List<Long> spec = sa.getSpec();
 				
-				ArtSalesInfo salesInfo = orderDao.getObject(sales_id, ArtSalesInfo.class);
+				//a.sales_id,a.product_id,a.sales_name,a.title,a.sales_price,a.mkt_price,d.img_url sales_img
+				Object[] salesInfo = orderDao.querySalesProdInfoBySalesId(sales_id);
 				if(salesInfo == null){
 					throw new ServiceException("销售品【"+sales_id+"】不存在");
 				}
 				
+				StringBuffer sku_code = new StringBuffer(salesInfo[1].toString());
+				for(Long sid : spec) {
+					sku_code.append("&").append(sid);
+				}
+				String skuCode = CryptoUtil.encryptData(sku_code.toString());
 				
+				Object[] skuInfo = orderDao.querySkuSpecInfoBySkuCode(skuCode);
+				if(StringUtil.isEmpty(skuInfo) || StringUtil.isEmpty(skuInfo[0])){
+					throw new ServiceException("SKU规格【"+skuCode+"】不存在");
+				}
 				
 				
 				ArtOrderGoods orderGoods = new ArtOrderGoods();
+				orderGoods.setUser_id(orderCreateRequest.getUser_id());
 				orderGoods.setOrder_id(order_id);
 				orderGoods.setSales_id(sales_id);
-				orderGoods.setSales_name(salesInfo.getSales_name());
-				orderGoods.setTitle(salesInfo.getTitle());
-				orderGoods.setSku_id();
-				orderGoods.setSku_name();
-				orderGoods.setSales_price(salesInfo.getSales_price());
-				orderGoods.setMkt_price(salesInfo.getMkt_price());
+				orderGoods.setSales_name(salesInfo[2]+"");
+				orderGoods.setTitle(salesInfo[3]+"");
+				orderGoods.setSku_id(skuInfo[0]+"");
+				orderGoods.setSku_name(skuInfo[1]+"");
+				orderGoods.setSales_price(Double.valueOf(salesInfo[4].toString()));
+				orderGoods.setMkt_price(Double.valueOf(salesInfo[5].toString()));
 				orderGoods.setQty(sales_number);
-				//orderGoods.setSales_icon(salesInfo.gets);
+				orderGoods.setSales_icon(salesInfo[6]+"");
 				orderGoods.setStatus(1L);
 				orderGoods.setCreate_time(current_time);
 				goodsList.add(orderGoods);
@@ -104,12 +119,69 @@ public class OrderService {
 			
 			orderDao.savebatchObject(goodsList);
 			
+			orderCreateResponse.setUser_id(orderCreateRequest.getUser_id());
+			orderCreateResponse.setOrder_id(order_id);
+			
+			List<OrderGoods> order_goods = new ArrayList<OrderGoods>();
+			for(Object gd : goodsList) {
+				ArtOrderGoods goods = (ArtOrderGoods)gd;
+				
+				OrderGoods od = new OrderGoods();
+				od.setSales_id(goods.getSales_id());
+				od.setSales_name(goods.getSales_name());
+				od.setTitle(goods.getTitle());
+				od.setSku_id(goods.getSku_id());
+				od.setSku_name(goods.getSku_name());
+				od.setSales_price(goods.getSales_price());
+				od.setMkt_price(goods.getMkt_price());
+				od.setQty(goods.getQty());
+				od.setSales_icon(goods.getSales_icon());
+				
+				order_goods.add(od);
+			}
+			
+			return orderCreateResponse;
+			
 		} catch (Exception e) {
 			log.logError("订单生成失败",e);
 			throw new ServiceException("订单生成失败："+e.getMessage());
 		}
 		
-		return null;
+	}
+	
+	public void submitOrder(String json) throws ServiceException{
+		OrderCreateResponse orderCreateResponse = new OrderCreateResponse();
+		try {
+			
+			log.logInfo("json:"+json);
+			OrderCreateRequest orderCreateRequest = (OrderCreateRequest)JsonUtil.jsongToObject(json,OrderCreateRequest.class);
+			
+			if(null == orderCreateRequest){
+				throw new ServiceException("请求参数错误");
+			}
+			
+			List<Sales> sales = orderCreateRequest.getSales();
+			if(sales.size() == 0){
+				throw new ServiceException("商品信息为空");
+			}
+			
+			if(StringUtil.isEmpty(orderCreateRequest.getUser_id())){
+				throw new ServiceException("请求用户id为空");
+			}
+			
+			String order_id = OrderId.getInstance().getOrderId();
+			if(StringUtil.isEmpty(order_id)) {
+				throw new ServiceException("订单号获取失败");
+			}
+			
+			Date current_time = new Date();
+			
+			
+		} catch (Exception e) {
+			log.logError("订单提交失败",e);
+			throw new ServiceException("订单提交失败："+e.getMessage());
+		}
+		
 	}
 	
 	
@@ -161,5 +233,17 @@ public class OrderService {
 			throw new ServiceException("订单详情查询错误："+e.getMessage());
 		}
 	}
+	
+	public static void main(String[] args) {
+		List<Long> list = new ArrayList<Long>();
+		list.add(1L);
+		list.add(2L);
+		
+		System.out.println(list.toString());
+		
+		
+	}
+	
+	
 	
 }
