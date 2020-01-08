@@ -2,6 +2,7 @@ package com.nijiadehua.api.service;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +20,7 @@ import com.nijiadehua.api.controller.v1.order.response.OrderSearchResponse.Goods
 import com.nijiadehua.api.dao.OrderDao;
 import com.nijiadehua.api.exception.ServiceException;
 import com.nijiadehua.api.model.ArtOrderGoods;
+import com.nijiadehua.api.model.ArtSalesInfo;
 import com.nijiadehua.api.model.Page;
 import com.nijiadehua.api.util.JsonUtil;
 import com.nijiadehua.api.util.OrderId;
@@ -67,6 +69,7 @@ public class OrderService {
 				throw new ServiceException("订单号获取失败");
 			}
 			
+			Date current_time = new Date();
 			
 			Collection goodsList = new ArrayList<ArtOrderGoods>();
 			for(Sales sa : orderCreateRequest.getSales()){
@@ -74,29 +77,27 @@ public class OrderService {
 				int sales_number = sa.getQty();
 				List<Long> spec = sa.getSpec();
 				
-				//a.sales_id,a.product_id,a.sales_name,b.product_name,a.sales_price,a.mkt_price,a.sales_img,b.ava_stock,b.product_spec
-				Object[] salesProd = orderDao.querySalesProdInfoBySalesId(sales_id);
-				
-				if(salesProd == null){
+				ArtSalesInfo salesInfo = orderDao.getObject(sales_id, ArtSalesInfo.class);
+				if(salesInfo == null){
 					throw new ServiceException("销售品【"+sales_id+"】不存在");
 				}
 				
-				double sales_price = Double.valueOf(salesProd[4].toString());
-				double mkt_price = Double.valueOf(salesProd[5].toString());
-			
+				
+				
 				
 				ArtOrderGoods orderGoods = new ArtOrderGoods();
 				orderGoods.setOrder_id(order_id);
 				orderGoods.setSales_id(sales_id);
-				orderGoods.setSales_name(salesProd[2].toString());
-				orderGoods.setProd_name(salesProd[3].toString());
-				orderGoods.setProd_spec(String.valueOf(salesProd[7]));
-				orderGoods.setSales_price(sales_price);
-				orderGoods.setMkt_price(mkt_price);
-				orderGoods.setSales_number(sales_number);
-				orderGoods.setSales_icon(salesProd[5].toString());
+				orderGoods.setSales_name(salesInfo.getSales_name());
+				orderGoods.setTitle(salesInfo.getTitle());
+				orderGoods.setSku_id();
+				orderGoods.setSku_name();
+				orderGoods.setSales_price(salesInfo.getSales_price());
+				orderGoods.setMkt_price(salesInfo.getMkt_price());
+				orderGoods.setQty(sales_number);
+				//orderGoods.setSales_icon(salesInfo.gets);
 				orderGoods.setStatus(1L);
-				//orderGoods.setCreate_time(current_time);
+				orderGoods.setCreate_time(current_time);
 				goodsList.add(orderGoods);
 				
 			}
