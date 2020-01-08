@@ -6,8 +6,7 @@ import java.util.List;
 public class OrderDetailResponse {
 	
 	private String user_id;
-	private Long order_id;
-	private String order_no;
+	private String order_id;
 	private Long order_status;
 	private double order_amount;
 	private double pay_amount;
@@ -36,30 +35,15 @@ public class OrderDetailResponse {
 
 
 
-	public Long getOrder_id() {
+	public String getOrder_id() {
 		return order_id;
 	}
 
 
 
-	public void setOrder_id(Long order_id) {
+	public void setOrder_id(String order_id) {
 		this.order_id = order_id;
 	}
-
-
-
-	public String getOrder_no() {
-		return order_no;
-	}
-
-
-
-	public void setOrder_no(String order_no) {
-		this.order_no = order_no;
-	}
-
-	
-
 
 	public Long getOrder_status() {
 		return order_status;

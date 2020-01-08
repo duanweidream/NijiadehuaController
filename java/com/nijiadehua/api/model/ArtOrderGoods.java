@@ -16,8 +16,8 @@ import org.springframework.format.annotation.DateTimeFormat;
  * MenuInfo entity. @author MyEclipse Persistence Tools
  */
 @Entity
-@Table(name = "order_goods")
-public class OrderGoods implements java.io.Serializable {
+@Table(name = "art_order_goods")
+public class ArtOrderGoods implements java.io.Serializable {
 
 	// Fields
 	/**
@@ -25,14 +25,15 @@ public class OrderGoods implements java.io.Serializable {
 	 */
 	private static final long serialVersionUID = 1L;
 	private Long id;
-	private Long order_id;
+	private String order_id;
 	private Long sales_id;
 	private String sales_name;
-	private String prod_name;
-	private String prod_spec;
+	private String title;
+	private String sku_id;
+	private String sku_name;
 	private Double sales_price;
 	private Double mkt_price;
-	private Integer sales_number;
+	private Integer qty;
 	private String sales_icon;
 	private Long status;
 	private Date create_time;
@@ -41,7 +42,7 @@ public class OrderGoods implements java.io.Serializable {
 	// Constructors
 
 	/** default constructor */
-	public OrderGoods() {
+	public ArtOrderGoods() {
 	}
 
 	// Property accessors
@@ -57,11 +58,11 @@ public class OrderGoods implements java.io.Serializable {
 	}
 
 	@Column(name = "order_id")
-	public Long getOrder_id() {
+	public String getOrder_id() {
 		return order_id;
 	}
 
-	public void setOrder_id(Long order_id) {
+	public void setOrder_id(String order_id) {
 		this.order_id = order_id;
 	}
 	
@@ -83,23 +84,31 @@ public class OrderGoods implements java.io.Serializable {
 		this.sales_name = sales_name;
 	}
 	
-	@Column(name = "prod_name")
-	public String getProd_name() {
-		return prod_name;
+	@Column(name = "title")
+	public String getTitle() {
+		return title;
 	}
 
-	public void setProd_name(String prod_name) {
-		this.prod_name = prod_name;
+	public void setTitle(String title) {
+		this.title = title;
 	}
 	
-	
-	@Column(name = "prod_spec")
-	public String getProd_spec() {
-		return prod_spec;
+	@Column(name = "sku_id")
+	public String getSku_id() {
+		return sku_id;
 	}
 
-	public void setProd_spec(String prod_spec) {
-		this.prod_spec = prod_spec;
+	public void setSku_id(String sku_id) {
+		this.sku_id = sku_id;
+	}
+	
+	@Column(name = "sku_name")
+	public String getSku_name() {
+		return sku_name;
+	}
+
+	public void setSku_name(String sku_name) {
+		this.sku_name = sku_name;
 	}
 
 	@Column(name = "sales_price")
@@ -121,15 +130,16 @@ public class OrderGoods implements java.io.Serializable {
 		this.mkt_price = mkt_price;
 	}
 
-	@Column(name = "sales_number")
-	public Integer getSales_number() {
-		return sales_number;
+	
+	@Column(name = "qty")
+	public Integer getQty() {
+		return qty;
 	}
 
-	public void setSales_number(Integer sales_number) {
-		this.sales_number = sales_number;
+	public void setQty(Integer qty) {
+		this.qty = qty;
 	}
-	
+
 	@Column(name = "sales_icon")
 	public String getSales_icon() {
 		return sales_icon;

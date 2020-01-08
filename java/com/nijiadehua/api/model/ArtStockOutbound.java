@@ -21,7 +21,7 @@ import org.springframework.format.annotation.DateTimeFormat;
  */
 @Entity
 @Table(name = "goods_stock_outbound")
-public class GoodsStockOutbound implements java.io.Serializable {
+public class ArtStockOutbound implements java.io.Serializable {
 
 	// Fields
 	/**
@@ -46,7 +46,7 @@ public class GoodsStockOutbound implements java.io.Serializable {
 	// Constructors
 	
 	/** default constructor */
-	public GoodsStockOutbound() {
+	public ArtStockOutbound() {
 	}
 
 	// Property accessors
