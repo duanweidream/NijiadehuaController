@@ -12,6 +12,7 @@ import com.nijiadehua.api.base.db.JdbcTemplate;
 import com.nijiadehua.api.base.db.Sql;
 import com.nijiadehua.api.base.log.Logger;
 import com.nijiadehua.api.controller.v1.order.request.OrderCreateRequest;
+import com.nijiadehua.api.controller.v1.order.request.OrderSubmitRequest;
 import com.nijiadehua.api.controller.v1.order.request.OrderCreateRequest.Sales;
 import com.nijiadehua.api.controller.v1.order.response.OrderCreateResponse;
 import com.nijiadehua.api.controller.v1.order.response.OrderDetailResponse;
@@ -150,31 +151,26 @@ public class OrderService {
 	}
 	
 	public void submitOrder(String json) throws ServiceException{
-		OrderCreateResponse orderCreateResponse = new OrderCreateResponse();
+		
 		try {
 			
 			log.logInfo("json:"+json);
-			OrderCreateRequest orderCreateRequest = (OrderCreateRequest)JsonUtil.jsongToObject(json,OrderCreateRequest.class);
+			OrderSubmitRequest orderSubmitRequest = (OrderSubmitRequest)JsonUtil.jsongToObject(json,OrderSubmitRequest.class);
 			
-			if(null == orderCreateRequest){
+			if(null == orderSubmitRequest){
 				throw new ServiceException("请求参数错误");
 			}
 			
-			List<Sales> sales = orderCreateRequest.getSales();
-			if(sales.size() == 0){
-				throw new ServiceException("商品信息为空");
-			}
-			
-			if(StringUtil.isEmpty(orderCreateRequest.getUser_id())){
-				throw new ServiceException("请求用户id为空");
-			}
-			
-			String order_id = OrderId.getInstance().getOrderId();
-			if(StringUtil.isEmpty(order_id)) {
-				throw new ServiceException("订单号获取失败");
+			if(StringUtil.isEmpty(orderSubmitRequest.getUser_id(),orderSubmitRequest.getOrder_id(),orderSubmitRequest.getDelivery())){
+				throw new ServiceException("缺少必要参数");
 			}
 			
 			Date current_time = new Date();
+			/**part1 start*/
+			
+			/**part1 end*/
+			
+			
 			
 			
 		} catch (Exception e) {
