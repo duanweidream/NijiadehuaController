@@ -7,6 +7,7 @@ public class SearchResponse {
 	private String sort_short_name;
 	private String sort_long_name;
 	private String sales_name;
+	private String sales_title;
 	private String art_name;
 	private Double sales_price;
 	private Double mkt_price;
@@ -42,6 +43,13 @@ public class SearchResponse {
 		this.sales_name = sales_name;
 	}
 	
+	
+	public String getSales_title() {
+		return sales_title;
+	}
+	public void setSales_title(String sales_title) {
+		this.sales_title = sales_title;
+	}
 	public String getArt_name() {
 		return art_name;
 	}

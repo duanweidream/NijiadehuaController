@@ -8,7 +8,7 @@ import com.nijiadehua.api.model.ArtOrderGoods;
 
 public class OrderSearchResponse {
 	
-	private String user_id;
+	private Long user_id;
 	private String order_id;
 	private Long order_status;
 	private double order_amount;
@@ -18,13 +18,11 @@ public class OrderSearchResponse {
 	private List<Goods> goods = new ArrayList<Goods>();
 	
 	
-	public String getUser_id() {
+	public Long getUser_id() {
 		return user_id;
 	}
 
-
-
-	public void setUser_id(String user_id) {
+	public void setUser_id(Long user_id) {
 		this.user_id = user_id;
 	}
 
@@ -117,7 +115,7 @@ public class OrderSearchResponse {
 	public static class Goods{
 		private Long sales_id;
 		private String sales_name;
-		private String title;
+		private String sales_title;
 		private Long sku_id;
 		private String sku_name;
 		private Double sales_price;
@@ -136,13 +134,13 @@ public class OrderSearchResponse {
 		public void setSales_name(String sales_name) {
 			this.sales_name = sales_name;
 		}
-		public String getTitle() {
-			return title;
-		}
-		public void setTitle(String title) {
-			this.title = title;
-		}
 		
+		public String getSales_title() {
+			return sales_title;
+		}
+		public void setSales_title(String sales_title) {
+			this.sales_title = sales_title;
+		}
 		public Long getSku_id() {
 			return sku_id;
 		}

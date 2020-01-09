@@ -66,7 +66,7 @@ public class MingjiaSalesController {
 	
 	@ResponseBody
 	@RequestMapping(value="/detail",method=RequestMethod.GET)
-	public Result detail(String sales_id) throws Exception {
+	public Result detail(Long sales_id) throws Exception {
 		try {
 			if(StringUtil.isEmpty(sales_id)){
 				return new Result(ApiError.Type.INVALID_PARAM.toException("参数错误!"));
@@ -90,7 +90,7 @@ public class MingjiaSalesController {
 
 	@ResponseBody
 	@RequestMapping(value="/attr",method=RequestMethod.GET)
-	public Result attr(String sales_id) throws Exception{
+	public Result attr(Long sales_id) throws Exception{
 		try {
 			if(StringUtil.isEmpty(sales_id)){
 				return new Result(ApiError.Type.INVALID_PARAM.toException("参数错误!"));

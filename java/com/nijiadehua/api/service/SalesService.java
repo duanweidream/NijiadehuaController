@@ -28,15 +28,15 @@ public class SalesService {
 	private JdbcTemplate jdbcTemplate = new JdbcTemplate();
 	
 	public void searchSalesForPage(Page page,String sort_id) throws ApiError{
-		Sql sql = new Sql(" select a.sales_id,c.sort_code,c.sort_short_name,c.sort_long_name,a.sales_name,e.artist_name art_name,a.sales_price,a.mkt_price,d.img_url sales_img ");
+		Sql sql = new Sql(" select a.sales_id,c.sort_code,c.sort_short_name,c.sort_long_name,a.sales_name,a.sales_title,e.artist_name art_name,a.sales_price,a.mkt_price,d.img_url sales_img ");
 		sql.append(" from art_sales_info a,art_sales_sort b,art_sort c,art_sales_img d,artist_info e ");
 		sql.append(" where a.sales_id = b.sales_id and b.sort_id = c.id and a.sales_id = d.sales_id and a.artist_id = e.id and d.img_sort = 1 and a.sales_status = 1 and a.sales_home = 1 ");
 		sql.append(" order by a.modify_time desc ");
 		jdbcTemplate.search(page, sql,SearchResponse.class);
 	}
 	
-	public DetailResponse findSalesBySalesId(String sales_id) throws ApiError{
-		Sql sql = new Sql(" select a.sales_id,c.sort_code,c.sort_short_name,c.sort_long_name,a.sales_name,a.title sales_title,d.artist_name art_name,a.sales_price,a.mkt_price  ");
+	public DetailResponse findSalesBySalesId(Long sales_id) throws ApiError{
+		Sql sql = new Sql(" select a.sales_id,c.sort_code,c.sort_short_name,c.sort_long_name,a.sales_name,a.sales_title sales_title,d.artist_name art_name,a.sales_price,a.mkt_price  ");
 		sql.append(" from art_sales_info a,art_sales_sort b,art_sort c ,artist_info d ");
 		sql.append(" where a.sales_id = b.sales_id and b.sort_id = c.id and a.sales_id = b.sales_id and a.artist_id = d.id and a.sales_status = 1 and a.sales_id = ? ");
 		sql.append(" order by a.modify_time desc ");
@@ -44,7 +44,7 @@ public class SalesService {
 		return jdbcTemplate.findObject(sql,DetailResponse.class);
 	}
 	
-	public List<String> findSalesImgBySalesId(String sales_id) throws ApiError{
+	public List<String> findSalesImgBySalesId(Long sales_id) throws ApiError{
 		
 		List<String> result = new ArrayList<String>();
 		
@@ -65,7 +65,7 @@ public class SalesService {
 	}
 	
 	
-	public List<SalesAttrResponse> findSalesAttrBySalesId(String sales_id) throws ServiceException{
+	public List<SalesAttrResponse> findSalesAttrBySalesId(Long sales_id) throws ServiceException{
 		try {
 			Sql sql = new Sql(" SELECT c.attr_id,c.attr_name ");
 			sql.append(" FROM art_sales_info a,art_prod_info b,art_attribute c  ");

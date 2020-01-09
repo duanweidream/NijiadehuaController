@@ -104,7 +104,7 @@ public class OrderService {
 				orderGoods.setOrder_id(order_id);
 				orderGoods.setSales_id(sales_id);
 				orderGoods.setSales_name(salesInfo[2]+"");
-				orderGoods.setTitle(salesInfo[3]+"");
+				orderGoods.setSales_title(salesInfo[3]+"");
 				orderGoods.setSku_id(skuInfo[0]+"");
 				orderGoods.setSku_name(skuInfo[1]+"");
 				orderGoods.setSales_price(Double.valueOf(salesInfo[4].toString()));
@@ -129,7 +129,7 @@ public class OrderService {
 				OrderGoods od = new OrderGoods();
 				od.setSales_id(goods.getSales_id());
 				od.setSales_name(goods.getSales_name());
-				od.setTitle(goods.getTitle());
+				od.setSales_title(goods.getSales_title());
 				od.setSku_id(goods.getSku_id());
 				od.setSku_name(goods.getSku_name());
 				od.setSales_price(goods.getSales_price());
@@ -199,7 +199,7 @@ public class OrderService {
 	
 			List<OrderSearchResponse> listTrip = (List<OrderSearchResponse>)page.getList();
 			for(OrderSearchResponse order : listTrip) {
-				Sql goods = new Sql(" select sales_id,sales_name,title,sku_id,sku_name,sales_price,mkt_price,qty,sales_icon from art_order_goods where order_id = ?  ");
+				Sql goods = new Sql(" select sales_id,sales_name,sales_title,sku_id,sku_name,sales_price,mkt_price,qty,sales_icon from art_order_goods where order_id = ?  ");
 				goods.addParam(order.getOrder_id());
 				List<Goods> goodsList = jdbcTemplate.queryForList(goods,Goods.class);
 				order.setGoods(goodsList);
@@ -214,7 +214,7 @@ public class OrderService {
 		}
 	}
 		
-	public OrderDetailResponse queryOrderDetailByOrderId(String user_id,String order_id) throws ServiceException{
+	public OrderDetailResponse queryOrderDetailByOrderId(Long user_id,String order_id) throws ServiceException{
 		try {
 			Sql sql = new Sql(" select user_id,order_id,order_status,order_amount,pay_amount,order_remark,create_time,delivery_mode,delivery_name,delivery_phone,delivery_address,delivery_send,express_company,express_number,express_freight from art_order_info where order_id = ? and user_id = ? ");
 			sql.addParam(order_id,user_id);

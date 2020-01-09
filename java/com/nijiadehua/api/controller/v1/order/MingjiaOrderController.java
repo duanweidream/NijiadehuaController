@@ -111,7 +111,7 @@ public class MingjiaOrderController{
 	
 	@ResponseBody
 	@RequestMapping(value="/detail",method=RequestMethod.GET)
-	public Result detail(String user_id,String order_id) throws ServiceException{
+	public Result detail(Long user_id,String order_id) throws ServiceException{
 		
 		if(StringUtil.isEmpty(user_id,order_id)){
 			return new Result(ApiError.Type.INVALID_PARAM.toException("参数错误!"));

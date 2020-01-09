@@ -29,7 +29,7 @@ public class ArtOrderGoods implements java.io.Serializable {
 	private String order_id;
 	private Long sales_id;
 	private String sales_name;
-	private String title;
+	private String sales_title;
 	private String sku_id;
 	private String sku_name;
 	private Double sales_price;
@@ -95,19 +95,21 @@ public class ArtOrderGoods implements java.io.Serializable {
 		this.sales_name = sales_name;
 	}
 	
-	@Column(name = "title")
-	public String getTitle() {
-		return title;
+	@Column(name = "sales_title")
+	public String getSales_title() {
+		return sales_title;
 	}
-
-	public void setTitle(String title) {
-		this.title = title;
+	
+	public void setSales_title(String sales_title) {
+		this.sales_title = sales_title;
 	}
+	
 	
 	@Column(name = "sku_id")
 	public String getSku_id() {
 		return sku_id;
 	}
+
 
 	public void setSku_id(String sku_id) {
 		this.sku_id = sku_id;

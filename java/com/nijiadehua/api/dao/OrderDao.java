@@ -16,7 +16,7 @@ public class OrderDao extends BaseDao {
 	 */
 	public Object[] querySalesProdInfoBySalesId(Long salesId) {
 		Statement stms = stmsFactory.createNativeStatement(
-				" select a.sales_id,a.product_id,a.sales_name,a.title,a.sales_price,a.mkt_price,d.img_url sales_img ");
+				" select a.sales_id,a.product_id,a.sales_name,a.sales_title,a.sales_price,a.mkt_price,d.img_url sales_img ");
 		stms.append(" from art_sales_info a,art_sales_sort b,art_sort c,art_sales_img d ");
 		stms.append(
 				" where a.sales_id = b.sales_id and b.sort_id = c.id and a.sales_id = d.sales_id and d.img_sort = 1 ");
