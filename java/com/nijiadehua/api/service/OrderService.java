@@ -167,10 +167,8 @@ public class OrderService {
 			
 			Date current_time = new Date();
 			/**part1 start*/
-			
+			//1.出库记录art_outbount_stock，2.art_prod_sku库存，3.保存订单信息、收货信息、支付信息
 			/**part1 end*/
-			
-			
 			
 			
 		} catch (Exception e) {
