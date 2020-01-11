@@ -68,8 +68,7 @@ public class AddressController {
 		
 		try {
 			
-			
-			
+			addressService.createUserAddress(json);
 			
 			return new Result();
 		}catch (Exception e) {
@@ -77,6 +76,56 @@ public class AddressController {
 		}
 	}
 
-
+	@ResponseBody
+	@RequestMapping(value="/update",method=RequestMethod.POST)
+	public Result update(@RequestBody String json) throws Exception {
+		if(StringUtil.isEmpty(json)){
+			return new Result(ApiError.Type.INVALID_PARAM.toException("参数错误!"));
+		}
+		
+		try {
+			
+			addressService.updateUserAddress(json);
+			
+			return new Result();
+		}catch (Exception e) {
+			return new Result(ApiError.Type.BUSINESS_ERROR.toException(e.getMessage()));
+		}
+	}
+	
+	@ResponseBody
+	@RequestMapping(value="/remove",method=RequestMethod.POST)
+	public Result remove(@RequestBody String json) throws Exception {
+		if(StringUtil.isEmpty(json)){
+			return new Result(ApiError.Type.INVALID_PARAM.toException("参数错误!"));
+		}
+		
+		try {
+			
+			addressService.removeUserAddress(json);
+			
+			return new Result();
+		}catch (Exception e) {
+			return new Result(ApiError.Type.BUSINESS_ERROR.toException(e.getMessage()));
+		}
+	}
+	
+	@ResponseBody
+	@RequestMapping(value="/collect/set",method=RequestMethod.POST)
+	public Result collectSet(@RequestBody String json) throws Exception {
+		if(StringUtil.isEmpty(json)){
+			return new Result(ApiError.Type.INVALID_PARAM.toException("参数错误!"));
+		}
+		
+		try {
+			
+			addressService.collectUserAddress(json);
+			
+			return new Result();
+		}catch (Exception e) {
+			return new Result(ApiError.Type.BUSINESS_ERROR.toException(e.getMessage()));
+		}
+	}
+	
 	
 }
