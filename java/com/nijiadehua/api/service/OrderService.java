@@ -13,6 +13,7 @@ import com.nijiadehua.api.base.db.Sql;
 import com.nijiadehua.api.base.log.Logger;
 import com.nijiadehua.api.controller.v1.order.request.OrderCreateRequest;
 import com.nijiadehua.api.controller.v1.order.request.OrderSubmitRequest;
+import com.nijiadehua.api.controller.v1.order.request.OrderSubmitRequest.Delivery;
 import com.nijiadehua.api.controller.v1.order.request.OrderCreateRequest.Sales;
 import com.nijiadehua.api.controller.v1.order.response.OrderCreateResponse;
 import com.nijiadehua.api.controller.v1.order.response.OrderDetailResponse;
@@ -22,6 +23,7 @@ import com.nijiadehua.api.controller.v1.order.response.OrderSearchResponse.Goods
 import com.nijiadehua.api.dao.OrderDao;
 import com.nijiadehua.api.exception.ServiceException;
 import com.nijiadehua.api.model.ArtOrderGoods;
+import com.nijiadehua.api.model.ArtOrderInfo;
 import com.nijiadehua.api.model.ArtSalesInfo;
 import com.nijiadehua.api.model.Page;
 import com.nijiadehua.api.util.CryptoUtil;
@@ -106,7 +108,7 @@ public class OrderService {
 				orderGoods.setSales_id(sales_id);
 				orderGoods.setSales_name(salesInfo[2]+"");
 				orderGoods.setSales_title(salesInfo[3]+"");
-				orderGoods.setSku_id(skuInfo[0]+"");
+				orderGoods.setSku_id(Long.valueOf(skuInfo[0].toString()));
 				orderGoods.setSku_name(skuInfo[1]+"");
 				orderGoods.setSales_price(Double.valueOf(salesInfo[4].toString()));
 				orderGoods.setMkt_price(Double.valueOf(salesInfo[5].toString()));
@@ -141,6 +143,7 @@ public class OrderService {
 				order_goods.add(od);
 			}
 			
+			orderCreateResponse.setOrder_goods(order_goods);
 			return orderCreateResponse;
 			
 		} catch (Exception e) {
@@ -165,12 +168,75 @@ public class OrderService {
 				throw new ServiceException("缺少必要参数");
 			}
 			
+			List<ArtOrderGoods> goods = orderDao.queryOrderGoodsByOrderId(orderSubmitRequest.getOrder_id());
+			if(goods == null || goods.size() == 0) {
+				throw new ServiceException("订单商品不存在");
+			}
+			
 			Date current_time = new Date();
-			/**part1 start*/
-			//1.出库记录art_outbount_stock，2.art_prod_sku库存，3.保存订单信息、收货信息、支付信息
-			/**part1 end*/
 			
+			double order_amount = 0;
+			double pay_amount = 0;
+			for(ArtOrderGoods good : goods) {
+				
+				//a.sales_id,a.product_id,a.sales_name,a.title,a.sales_price,a.mkt_price,d.img_url sales_img
+				Object[] salesInfo = orderDao.querySalesProdInfoBySalesId(good.getSales_id());
+				if(salesInfo == null){
+					throw new ServiceException("销售品【"+good.getSales_id()+"】不存在或已下架");
+				}
+				
+				int stock = orderDao.queryProdStockBySkuId(good.getSku_id());
+				if(good.getQty() > stock) {
+					throw new ServiceException("【"+good.getSales_id()+"】库存不足，当前库存："+stock+"，购入数量："+good.getQty());
+				}
+				
+				
+				Sql outbount = new Sql(" insert into art_stock_outbound (product_id,sku_id,out_stock,out_type,remark,valid,create_time,modify_time) values (?,?,?,?,?,?,?,?) ");
+				outbount.addParam(salesInfo[1],good.getSku_id(),good.getQty(),1,good.getOrder_id(),1,current_time,current_time);
+				Long out_id = jdbcTemplate.saveObject(outbount);
+				if(out_id == null) {
+					throw new ServiceException("销售品【"+good.getSales_id()+"】扣减库存失败");
+				}
+				
+				Sql sku = new Sql(" update art_prod_sku set sku_stock = ?,modify_time = ? where sku_id = ? ");
+				sku.addParam(stock - good.getQty(),current_time,good.getSku_id());
+				int sku_result = jdbcTemplate.updateObject(sku);
+				if(sku_result == 0) {
+					throw new ServiceException("销售品【"+good.getSales_id()+"】扣减库存失败");
+				}
+				
+				order_amount += good.getSales_price();
+				pay_amount += good.getSales_price();
+				
+			}
 			
+			/*Delivery delivery = orderSubmitRequest.getDelivery();
+			Sql order = new Sql(" insert into art_order_info (order_id,user_id,order_sort,order_status,order_amount,pay_type,pay_amount,delivery_mode,delivery_send,delivery_name,delivery_phone,delivery_country,delivery_province,delivery_city,delivery_district,delivery_address,delivery_postal_code,order_remark,create_time) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) ");
+			order.addParam(orderSubmitRequest.getOrder_id(),orderSubmitRequest.getUser_id(),"shufa",1,order_amount,orderSubmitRequest.getPay_type(),pay_amount,delivery.getDelivery_mode(),delivery.getDelivery_send(),delivery.getDelivery_name(),delivery.getDelivery_phone(),delivery.getDelivery_country(),delivery.getDelivery_province(),delivery.getDelivery_city(),delivery.getDelivery_district(),delivery.getDelivery_address(),delivery.getDelivery_postal_code(),orderSubmitRequest.getOrder_remark(),current_time);
+			jdbcTemplate.saveObject(order);*/
+			
+			ArtOrderInfo orderInfo = new ArtOrderInfo();
+			Delivery delivery = orderSubmitRequest.getDelivery();
+			orderInfo.setOrder_id(orderSubmitRequest.getOrder_id());
+			orderInfo.setUser_id(orderSubmitRequest.getUser_id());
+			orderInfo.setOrder_sort("shufa");
+			orderInfo.setOrder_status(1L);
+			orderInfo.setOrder_amount(order_amount);
+			orderInfo.setPay_type(orderSubmitRequest.getPay_type());
+			orderInfo.setPay_amount(pay_amount);
+			orderInfo.setDelivery_mode(delivery.getDelivery_mode());
+			orderInfo.setDelivery_send(delivery.getDelivery_send());
+			orderInfo.setDelivery_name(delivery.getDelivery_name());
+			orderInfo.setDelivery_phone(delivery.getDelivery_phone());
+			orderInfo.setDelivery_country(delivery.getDelivery_country());
+			orderInfo.setDelivery_province(delivery.getDelivery_province());
+			orderInfo.setDelivery_city(delivery.getDelivery_city());
+			orderInfo.setDelivery_district(delivery.getDelivery_district());
+			orderInfo.setDelivery_address(delivery.getDelivery_address());
+			orderInfo.setDelivery_postal_code(delivery.getDelivery_postal_code());
+			orderInfo.setOrder_remark(orderSubmitRequest.getOrder_remark());
+			orderInfo.setCreate_time(current_time);
+			orderDao.saveObject(orderInfo);
 		} catch (Exception e) {
 			log.logError("订单提交失败",e);
 			throw new ServiceException("订单提交失败："+e.getMessage());
@@ -179,7 +245,7 @@ public class OrderService {
 	}
 	
 	
-	public void searchOrderForPage(Page page,String user_id,String status) throws ServiceException{
+	public void searchOrderForPage(Page page,Long user_id,Long status) throws ServiceException{
 		try {
 			Sql sql = new Sql(" select user_id,order_id,order_status,order_amount,pay_amount,order_remark,create_time from art_order_info where order_status <> 9 ");
 			sql.append("and", "user_id", "=", user_id);
@@ -210,12 +276,15 @@ public class OrderService {
 		
 	public OrderDetailResponse queryOrderDetailByOrderId(Long user_id,String order_id) throws ServiceException{
 		try {
-			Sql sql = new Sql(" select user_id,order_id,order_status,order_amount,pay_amount,order_remark,create_time,delivery_mode,delivery_name,delivery_phone,delivery_address,delivery_send,express_company,express_number,express_freight from art_order_info where order_id = ? and user_id = ? ");
+			Sql sql = new Sql(" select user_id,order_id,order_status,order_amount,pay_amount,order_remark,DATE_FORMAT(create_time,'%Y-%m-%d %H:%i:%s') create_time,delivery_mode,delivery_name,delivery_phone,delivery_address,delivery_send,express_company,express_number,express_freight from art_order_info where order_id = ? and user_id = ? ");
 			sql.addParam(order_id,user_id);
 			
 			OrderDetailResponse order = jdbcTemplate.findObject(sql, OrderDetailResponse.class);
+			if(order == null) {
+				throw new ServiceException("订单【"+order_id+"】不存在");
+			}
 			
-			Sql goods = new Sql(" select sales_id,sales_name,title,sku_id,sku_name,sales_price,mkt_price,qty,sales_icon from art_order_goods where order_id = ?  ");
+			Sql goods = new Sql(" select sales_id,sales_name,sales_title,sku_id,sku_name,sales_price,mkt_price,qty,sales_icon from art_order_goods where order_id = ?  ");
 			goods.addParam(order.getOrder_id());
 			List<com.nijiadehua.api.controller.v1.order.response.OrderDetailResponse.Goods> goodsList = jdbcTemplate.queryForList(goods,com.nijiadehua.api.controller.v1.order.response.OrderDetailResponse.Goods.class);
 			order.setGoods(goodsList);
@@ -229,13 +298,8 @@ public class OrderService {
 	}
 	
 	public static void main(String[] args) {
-		List<Long> list = new ArrayList<Long>();
-		list.add(1L);
-		list.add(2L);
 		
-		System.out.println(list.toString());
-		
-		
+	
 	}
 	
 	

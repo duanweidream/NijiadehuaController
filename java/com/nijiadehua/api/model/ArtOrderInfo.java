@@ -16,16 +16,16 @@ import org.springframework.format.annotation.DateTimeFormat;
  * MenuInfo entity. @author MyEclipse Persistence Tools
  */
 @Entity
-@Table(name = "order_info")
-public class OrderInfo implements java.io.Serializable {
+@Table(name = "art_order_info")
+public class ArtOrderInfo implements java.io.Serializable {
 
 	// Fields
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	private Long order_id;
-	private String order_no;
+	private String order_id;
+	private Long user_id;
 	private String order_sort;
 	private Long order_status;
 	private Double order_amount;
@@ -33,47 +33,50 @@ public class OrderInfo implements java.io.Serializable {
 	private Double pay_amount;
 	private Date pay_time;
 	private Integer delivery_mode;
+	private Integer delivery_send;
 	private String delivery_name;
 	private String delivery_phone;
+	private String delivery_country;
+	private String delivery_province;
+	private String delivery_city;
+	private String delivery_district;
 	private String delivery_address;
-	private String delivery_company;
-	private String delivery_no;
-	private Double delivery_fee;
-	private Integer delivery_send;
+	private String delivery_postal_code;
+	private String express_company;
+	private String express_number;
+	private Double express_freight;
 	private String order_remark;
-	private Date order_create_time;
+	private Date create_time;
 
 
 	// Constructors
 
 	/** default constructor */
-	public OrderInfo() {
+	public ArtOrderInfo() {
 	}
 
 	// Property accessors
 	@Id
-	@GeneratedValue(strategy = IDENTITY)
 	@Column(name = "order_id", unique = true, nullable = false)
-	public Long getOrder_id() {
+	public String getOrder_id() {
 		return order_id;
 	}
 
 
-	public void setOrder_id(Long order_id) {
+	public void setOrder_id(String order_id) {
 		this.order_id = order_id;
 	}
-
-	@Column(name = "order_no")
-	public String getOrder_no() {
-		return order_no;
-	}
-
-
-	public void setOrder_no(String order_no) {
-		this.order_no = order_no;
-	}
 	
 	
+	@Column(name = "user_id")
+	public Long getUser_id() {
+		return user_id;
+	}
+
+	public void setUser_id(Long user_id) {
+		this.user_id = user_id;
+	}
+
 	@Column(name = "order_sort")
 	public String getOrder_sort() {
 		return order_sort;
@@ -142,7 +145,16 @@ public class OrderInfo implements java.io.Serializable {
 	public void setDelivery_mode(Integer delivery_mode) {
 		this.delivery_mode = delivery_mode;
 	}
+	
+	@Column(name = "delivery_send")
+	public Integer getDelivery_send() {
+		return delivery_send;
+	}
 
+	public void setDelivery_send(Integer delivery_send) {
+		this.delivery_send = delivery_send;
+	}
+	
 	@Column(name = "delivery_name")
 	public String getDelivery_name() {
 		return delivery_name;
@@ -161,6 +173,52 @@ public class OrderInfo implements java.io.Serializable {
 		this.delivery_phone = delivery_phone;
 	}
 	
+	
+	@Column(name = "delivery_country")
+	public String getDelivery_country() {
+		return delivery_country;
+	}
+
+	public void setDelivery_country(String delivery_country) {
+		this.delivery_country = delivery_country;
+	}
+	
+	@Column(name = "delivery_province")
+	public String getDelivery_province() {
+		return delivery_province;
+	}
+
+	public void setDelivery_province(String delivery_province) {
+		this.delivery_province = delivery_province;
+	}
+	
+	@Column(name = "delivery_city")
+	public String getDelivery_city() {
+		return delivery_city;
+	}
+
+	public void setDelivery_city(String delivery_city) {
+		this.delivery_city = delivery_city;
+	}
+	
+	@Column(name = "delivery_district")
+	public String getDelivery_district() {
+		return delivery_district;
+	}
+
+	public void setDelivery_district(String delivery_district) {
+		this.delivery_district = delivery_district;
+	}
+	
+	@Column(name = "delivery_postal_code")
+	public String getDelivery_postal_code() {
+		return delivery_postal_code;
+	}
+
+	public void setDelivery_postal_code(String delivery_postal_code) {
+		this.delivery_postal_code = delivery_postal_code;
+	}
+
 	@Column(name = "delivery_address")
 	public String getDelivery_address() {
 		return delivery_address;
@@ -170,40 +228,34 @@ public class OrderInfo implements java.io.Serializable {
 		this.delivery_address = delivery_address;
 	}
 	
-	@Column(name = "delivery_company")
-	public String getDelivery_company() {
-		return delivery_company;
-	}
+	
+	
 
-	public void setDelivery_company(String delivery_company) {
-		this.delivery_company = delivery_company;
+	@Column(name = "express_company")
+	public String getExpress_company() {
+		return express_company;
 	}
 	
-	@Column(name = "delivery_no")
-	public String getDelivery_no() {
-		return delivery_no;
+	public void setExpress_company(String express_company) {
+		this.express_company = express_company;
 	}
 
-	public void setDelivery_no(String delivery_no) {
-		this.delivery_no = delivery_no;
+	@Column(name = "express_number")
+	public String getExpress_number() {
+		return express_number;
 	}
 
-	@Column(name = "delivery_fee")
-	public Double getDelivery_fee() {
-		return delivery_fee;
+	public void setExpress_number(String express_number) {
+		this.express_number = express_number;
 	}
 
-	public void setDelivery_fee(Double delivery_fee) {
-		this.delivery_fee = delivery_fee;
+	@Column(name = "express_freight")
+	public Double getExpress_freight() {
+		return express_freight;
 	}
 	
-	@Column(name = "delivery_send")
-	public Integer getDelivery_send() {
-		return delivery_send;
-	}
-
-	public void setDelivery_send(Integer delivery_send) {
-		this.delivery_send = delivery_send;
+	public void setExpress_freight(Double express_freight) {
+		this.express_freight = express_freight;
 	}
 	
 	@Column(name = "order_remark")
@@ -211,19 +263,19 @@ public class OrderInfo implements java.io.Serializable {
 		return order_remark;
 	}
 
+
 	public void setOrder_remark(String order_remark) {
 		this.order_remark = order_remark;
 	}
 
-	@Column(name = "order_create_time")
+	@Column(name = "create_time")
 	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-	public Date getOrder_create_time() {
-		return order_create_time;
+	public Date getCreate_time() {
+		return create_time;
 	}
 
-
-	public void setOrder_create_time(Date order_create_time) {
-		this.order_create_time = order_create_time;
+	public void setCreate_time(Date create_time) {
+		this.create_time = create_time;
 	}
 
 	

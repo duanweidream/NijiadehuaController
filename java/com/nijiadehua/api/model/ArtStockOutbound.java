@@ -20,7 +20,7 @@ import org.springframework.format.annotation.DateTimeFormat;
  * MenuInfo entity. @author MyEclipse Persistence Tools
  */
 @Entity
-@Table(name = "goods_stock_outbound")
+@Table(name = "art_stock_outbound")
 public class ArtStockOutbound implements java.io.Serializable {
 
 	// Fields

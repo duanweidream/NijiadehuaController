@@ -35,7 +35,7 @@ public class AddressService {
 
 	public List<AddressResponse> queryAdressListByUserId(Long user_id) throws ServiceException {
 		try {
-			Sql sql = new Sql(" select * from art_user_address where user_id = ? and state = ? ORDER BY id ");
+			Sql sql = new Sql(" select * from art_user_address where user_id = ? and state = ? ORDER BY delivery_id ");
 			sql.addParam(user_id);
 			sql.addParam(1);
 			return jdbcTemplate.queryForList(sql, AddressResponse.class);
@@ -127,6 +127,10 @@ public class AddressService {
 			 if(StringUtil.isEmpty(jsonObject) || StringUtil.isEmpty(jsonObject.get("delivery_id")) || StringUtil.isEmpty(jsonObject.get("user_id"))) {
 				throw new ServiceException("缺少必须参数");
 			 }
+			 
+			 Sql collect = new Sql(" update art_user_address set is_collect = 0 where user_id = ? ");
+			 collect.addParam(jsonObject.get("user_id"));
+			 jdbcTemplate.updateObject(collect);
 			 
 			Sql sql = new Sql(" update art_user_address set is_collect = 1 where delivery_id = ? and user_id = ? ");
 			sql.addParam(jsonObject.get("delivery_id"),jsonObject.get("user_id"));

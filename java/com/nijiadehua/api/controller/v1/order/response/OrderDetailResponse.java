@@ -20,7 +20,7 @@ public class OrderDetailResponse {
 	private int delivery_send;
 	private String express_company;
 	private String express_number;
-	private String express_freight;
+	private Double express_freight;
 	
 	
 	public Long getUser_id() {
@@ -202,13 +202,13 @@ public class OrderDetailResponse {
 
 
 
-	public String getExpress_freight() {
+	public Double getExpress_freight() {
 		return express_freight;
 	}
 
 
 
-	public void setExpress_freight(String express_freight) {
+	public void setExpress_freight(Double express_freight) {
 		this.express_freight = express_freight;
 	}
 

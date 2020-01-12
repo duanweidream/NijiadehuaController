@@ -77,7 +77,7 @@ public class MingjiaOrderController{
 	
 	@ResponseBody
 	@RequestMapping(value="/search",method=RequestMethod.GET)
-	public Result search(String user_id,String status,String startIndex,String itemCount) throws Exception {
+	public Result search(Long user_id,Long status,String startIndex,String itemCount) throws Exception {
 		
 		try {
 			

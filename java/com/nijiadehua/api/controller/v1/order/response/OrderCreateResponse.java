@@ -52,7 +52,7 @@ public class OrderCreateResponse {
 		private Long sales_id;
 		private String sales_name;
 		private String sales_title;
-		private String sku_id;
+		private Long sku_id;
 		private String sku_name;
 		private Double sales_price;
 		private Double mkt_price;
@@ -77,10 +77,10 @@ public class OrderCreateResponse {
 		public void setSales_title(String sales_title) {
 			this.sales_title = sales_title;
 		}
-		public String getSku_id() {
+		public Long getSku_id() {
 			return sku_id;
 		}
-		public void setSku_id(String sku_id) {
+		public void setSku_id(Long sku_id) {
 			this.sku_id = sku_id;
 		}
 		public String getSku_name() {

@@ -62,10 +62,15 @@ public class OrderSubmitRequest implements Serializable {
 
 	public static class Delivery {
 		private int delivery_mode;
+		private int delivery_send;
 		private String delivery_name;
 		private String delivery_phone;
+		private String delivery_country;
+		private String delivery_province;
+		private String delivery_city;
+		private String delivery_district;
 		private String delivery_address;
-		private int delivery_send;
+		private String delivery_postal_code;
 
 		public int getDelivery_mode() {
 			return delivery_mode;
@@ -107,6 +112,48 @@ public class OrderSubmitRequest implements Serializable {
 			this.delivery_send = delivery_send;
 		}
 
+		public String getDelivery_country() {
+			return delivery_country;
+		}
+
+		public void setDelivery_country(String delivery_country) {
+			this.delivery_country = delivery_country;
+		}
+
+		public String getDelivery_province() {
+			return delivery_province;
+		}
+
+		public void setDelivery_province(String delivery_province) {
+			this.delivery_province = delivery_province;
+		}
+
+		public String getDelivery_city() {
+			return delivery_city;
+		}
+
+		public void setDelivery_city(String delivery_city) {
+			this.delivery_city = delivery_city;
+		}
+
+		public String getDelivery_district() {
+			return delivery_district;
+		}
+
+		public void setDelivery_district(String delivery_district) {
+			this.delivery_district = delivery_district;
+		}
+
+		public String getDelivery_postal_code() {
+			return delivery_postal_code;
+		}
+
+		public void setDelivery_postal_code(String delivery_postal_code) {
+			this.delivery_postal_code = delivery_postal_code;
+		}
+		
+		
+		
 	}
 
 }
