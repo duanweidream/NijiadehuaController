@@ -10,6 +10,8 @@ import com.nijiadehua.api.base.http.HttpClientUtils;
 import com.nijiadehua.api.base.log.Logger;
 import com.nijiadehua.api.util.MD5Util;
 
+import sun.security.jgss.spi.MechanismFactory;
+
 //微信支付工具类
 public class MiniPayUtil {
 
@@ -38,9 +40,9 @@ public class MiniPayUtil {
 		map.put("mch_id", MCH_ID);
 		map.put("openid", openid);
 		map.put("nonce_str", Sha1Util.getNonceStr());
-		map.put("body", goods);
-		map.put("out_trade_no", "20200113152122111115"); //商户系统内部订单号，要求32个字符内
-		map.put("total_fee", amount+100+""); //标价金额,标价金额
+		map.put("body", new String(goods.getBytes("utf-8")));
+		map.put("out_trade_no", order_id); //商户系统内部订单号，要求32个字符内
+		map.put("total_fee", amount+""); //标价金额,标价金额
 		map.put("spbill_create_ip", ip); //终端IP,调用微信支付API的机器IP
 		map.put("notify_url",NOTIFY_URL); //异步接收微信支付结果通知的回调地址，通知url必须为外网可访问的url，不能携带参数。
 		map.put("trade_type", "JSAPI");
@@ -81,6 +83,23 @@ public class MiniPayUtil {
      * @return 签名是否正确
      * @throws Exception
      */
+    public static boolean isSignatureValid(Map<String, String> data) throws Exception {
+        if (!data.containsKey(FIELD_SIGN) ){
+            return false;
+        }
+        String sign = data.get(FIELD_SIGN);
+        return generateSignature(data,MCH_SECRET).equals(sign);
+    }
+	
+    /**
+     * 判断签名是否正确，必须包含sign字段，否则返回false。
+     *
+     * @param data Map类型数据
+     * @param key API密钥
+     * @param signType 签名方式
+     * @return 签名是否正确
+     * @throws Exception
+     */
     public static boolean isSignatureValid(Map<String, String> data, String key) throws Exception {
         if (!data.containsKey(FIELD_SIGN) ){
             return false;
@@ -89,6 +108,31 @@ public class MiniPayUtil {
         return generateSignature(data, key).equals(sign);
     }
 	
+    /**
+     * 生成签名. 注意，若含有sign_type字段，必须和signType参数保持一致。
+     *
+     * @param data 待签名数据
+     * @param key API密钥
+     * @param signType 签名方式
+     * @return 签名
+     */
+    public static String generateSignature(final Map<String, String> data) throws Exception {
+        Set<String> keySet = data.keySet();
+        String[] keyArray = keySet.toArray(new String[keySet.size()]);
+        Arrays.sort(keyArray);
+        StringBuilder sb = new StringBuilder();
+        for (String k : keyArray) {
+            if (k.equals(FIELD_SIGN)) {
+                continue;
+            }
+            if (data.get(k).trim().length() > 0) // 参数值为空，则不参与签名
+                sb.append(k).append("=").append(data.get(k).trim()).append("&");
+        }
+        sb.append("key=").append(MCH_ID);
+        return MD5Util.MD5Encode(sb.toString(),charset).toUpperCase();
+    }
+    
+    
     /**
      * 生成签名. 注意，若含有sign_type字段，必须和signType参数保持一致。
      *
