@@ -30,23 +30,24 @@ public class MiniPayUtil {
     public static final String FIELD_SIGN = "sign";
     public static final String FIELD_SIGN_TYPE = "sign_type";
 
-	public static Map<String,String> unifiedorder(String uri,String openid,String ip) throws Exception{
-		
+    public static Map<String,String> unifiedorder(String openid,String ip,String order_id,String goods,int amount) throws Exception{
+    	String url = "https://api.mch.weixin.qq.com/pay/unifiedorder";
+    	
 		SortedMap<String, String> map = new TreeMap<String, String>();
 		map.put("appid", APP_ID);
 		map.put("mch_id", MCH_ID);
 		map.put("openid", openid);
 		map.put("nonce_str", Sha1Util.getNonceStr());
-		map.put("body", "test");
+		map.put("body", goods);
 		map.put("out_trade_no", "20200113152122111115"); //商户系统内部订单号，要求32个字符内
-		map.put("total_fee", 1+""); //标价金额,标价金额
+		map.put("total_fee", amount+100+""); //标价金额,标价金额
 		map.put("spbill_create_ip", ip); //终端IP,调用微信支付API的机器IP
 		map.put("notify_url",NOTIFY_URL); //异步接收微信支付结果通知的回调地址，通知url必须为外网可访问的url，不能携带参数。
 		map.put("trade_type", "JSAPI");
 		map.put("sign", generateSignature(map, MCH_SECRET));
 		
 		String xml = XMLUtil.mapToXml(map);
-		String responseXml = HttpClientUtils.postXml(uri,xml);
+		String responseXml = HttpClientUtils.postXml(url,xml);
 		
         String return_code;
         Map<String, String> respData = XMLUtil.xmlToMap(responseXml);
@@ -134,9 +135,10 @@ public class MiniPayUtil {
 		
 		//String responseXml = unifiedorder("https://api.mch.weixin.qq.com/pay/unifiedorder", "oDjJa5JcnGyPCnQEP_XDesqX-W1U", "223.202.209.6");
 		//System.out.println(responseXml);
-		Map<String,String> map = unifiedorder("https://api.mch.weixin.qq.com/pay/unifiedorder", "oDjJa5JcnGyPCnQEP_XDesqX-W1U", "223.202.209.6");
+		//Map<String,String> map = unifiedorder("https://api.mch.weixin.qq.com/pay/unifiedorder", "oDjJa5JcnGyPCnQEP_XDesqX-W1U", "223.202.209.6");
+		//System.out.println(map);
+		Map<String,String> map = unifiedorder("oDjJa5JcnGyPCnQEP_XDesqX-W1U", "223.202.209.6","DZ20190528160609934632","test",1);
 		System.out.println(map);
-		
 	}
 	
 }
