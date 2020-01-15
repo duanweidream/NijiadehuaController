@@ -53,8 +53,8 @@ public class PayService {
 			//{result_code=SUCCESS, sign=37363EE7B96A5432B9D447564D724F10, mch_id=1573616051, prepay_id=wx1319002573923303ad89e9881683799500, return_msg=OK, appid=wx6e2a2a319598b1e5, nonce_str=8vuZBLOdZOgamfzi, return_code=SUCCESS, trade_type=JSAPI}
 			int amount = (int)(pay_amount*100);
 			Map<String,String> unifiedorder = MiniPayUtil.unifiedorder(openid, ip, order_id, goods, amount);
-			if(unifiedorder.containsKey("prepay_id") || StringUtil.isEmpty(unifiedorder.get("prepay_id"))) {
-				throw new ServiceException("调用微信结果错误");
+			if(!unifiedorder.containsKey("prepay_id") || StringUtil.isEmpty(unifiedorder.get("prepay_id"))) {
+				throw new ServiceException("调用微信接口错误");
 			}
 			
 			String timeStamp = System.currentTimeMillis()+"";
@@ -62,16 +62,26 @@ public class PayService {
 			String prepay_id = unifiedorder.get("prepay_id");
 			String signType = "MD5";
 			
+			Date current_time = new Date();
 			
 			Sql queryPaySql = new Sql(" select * from art_pay_ifo where order_id = ? ");
 			queryPaySql.addParam(order_id);
 			ArtPayInfo artPayInfo = jdbcTemplate.findObject(queryPaySql, ArtPayInfo.class);
 			if(artPayInfo == null) {
-				Sql savePaySql = new Sql(" insert into art_pay_ifo () values () ");
-				savePaySql.addParam(order_id);
+				Sql savePaySql = new Sql(" insert into art_pay_ifo (order_id,prepay_id,order_amount,state,create_time,update_time) values (?,?,?,?,?,?,?) ");
+				savePaySql.addParam(order_id,prepay_id,pay_amount,0,current_time,current_time);
+				Long result = jdbcTemplate.saveObject(savePaySql);
+				if(result == null) {
+					throw new ServiceException("保存统一订单信息失败");
+				}
+				
 			}else {
-				Sql updatePaySql = new Sql(" update art_pay_ifo set a=1,b=1 where order_id = ? ");
+				Sql updatePaySql = new Sql(" update art_pay_ifo set prepay_id=?,update_time=? where order_id = ? ");
 				updatePaySql.addParam(order_id);
+				int result = jdbcTemplate.updateObject(updatePaySql);
+				if(result == 0) {
+					throw new ServiceException("更新统一订单信息失败");
+				}
 			}
 			
 			
@@ -105,13 +115,13 @@ public class PayService {
 			}
 			
 			Map<String, String> notify = XMLUtil.xmlToMap(xml);
-			if(notify.containsKey("return_code") || !notify.get("return_code").equals("SUCCESS")) {
+			if(!notify.containsKey("return_code") || !notify.get("return_code").equals("SUCCESS")) {
 				notifyResponse.setReturn_code("FAIL");
 				notifyResponse.setReturn_msg("通信失败");
 				return notifyResponse;
 			}
 			
-			if(notify.containsKey("result_code") || !notify.get("result_code").equals("SUCCESS")) {
+			if(!notify.containsKey("result_code") || !notify.get("result_code").equals("SUCCESS")) {
 				String err_code = notify.containsKey("err_code") ? notify.get("err_code") : "";
 				String err_code_des = notify.containsKey("err_code_des") ? notify.get("err_code_des") : "";
 				
@@ -178,12 +188,25 @@ public class PayService {
 		}
 		
 	}
+
 	
-	public static void main(String[] args) {
-		Map<String,String> map = new HashMap<String,String>();
-		
+	public UnifiedorderResponse queryOrderPayStatus(Long user_id,String ip,String order_id) throws ServiceException{
+		try {
+			UnifiedorderResponse unifiedorderResponse = new UnifiedorderResponse();
+			
+			Sql queryUser = new Sql(" select open_id from art_pay_info where user_id = ? ");
+			queryUser.addParam(user_id);
+			String openid = jdbcTemplate.findForString(queryUser);
+			if(StringUtil.isEmpty(openid)) {
+				throw new ServiceException("用户信息查询错误");
+			}
+			
+			return unifiedorderResponse;
+		}catch (Exception e) {
+			e.printStackTrace();
+			throw new ServiceException("统一下单失败："+e.getMessage());
+		}
 	}
-	
 	
 	
 }

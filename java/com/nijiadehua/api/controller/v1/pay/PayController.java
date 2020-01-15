@@ -1,5 +1,7 @@
 package com.nijiadehua.api.controller.v1.pay;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -10,10 +12,13 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.nijiadehua.api.base.http.HttpClient;
 import com.nijiadehua.api.base.rest.Result;
 import com.nijiadehua.api.controller.v1.pay.response.NotifyResponse;
+import com.nijiadehua.api.controller.v1.pay.response.UnifiedorderResponse;
 import com.nijiadehua.api.exception.ApiError;
 import com.nijiadehua.api.exception.ServiceException;
 import com.nijiadehua.api.service.PayService;
 import com.nijiadehua.api.util.StringUtil;
+
+import net.sf.json.JSONObject;
 /**
  * ClassName:PayController</br> Function: 支付相关 </br>
  * 
@@ -31,17 +36,22 @@ public class PayController{
 	
 	@ResponseBody
 	@RequestMapping(value="/unifiedorder",method=RequestMethod.POST)
-	public Result unifiedorder(@RequestBody String json) throws ServiceException{
+	public Result unifiedorder(@RequestBody String json,HttpServletRequest request) throws ServiceException{
 		
 		if(StringUtil.isEmpty(json)){
 			return new Result(ApiError.Type.INVALID_PARAM.toException("参数错误!"));
 		}
 		
 		try{
+			JSONObject jsonObject = JSONObject.fromObject(json);
+			Long user_id = jsonObject.getLong("user_id");
+			String order_id = jsonObject.getString("order_id");
 			
-			//OrderCreateResponse orderCreateResponse = orderService.createOrder(json);
+			String ip = StringUtil.isEmpty(request.getHeader("remote_client_ip")) ? request.getRemoteAddr() : request.getHeader("remote_client_ip");
 			
-			return new Result(null);
+			UnifiedorderResponse unifiedorderResponse = payService.unifiedorder(user_id, ip, order_id);
+			return new Result(unifiedorderResponse);
+			
 		}catch (Exception e) {
 			return new Result(ApiError.Type.BUSINESS_ERROR.toException(e.getMessage()));
 		}
