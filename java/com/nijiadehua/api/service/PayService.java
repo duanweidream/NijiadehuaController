@@ -190,21 +190,23 @@ public class PayService {
 	}
 
 	
-	public UnifiedorderResponse queryOrderPayStatus(Long user_id,String ip,String order_id) throws ServiceException{
+	public int queryOrderPayStatus(Long user_id,String order_id) throws ServiceException{
 		try {
-			UnifiedorderResponse unifiedorderResponse = new UnifiedorderResponse();
-			
-			Sql queryUser = new Sql(" select open_id from art_pay_info where user_id = ? ");
-			queryUser.addParam(user_id);
-			String openid = jdbcTemplate.findForString(queryUser);
-			if(StringUtil.isEmpty(openid)) {
-				throw new ServiceException("用户信息查询错误");
+			Sql queryUser = new Sql(" select * from art_pay_info where order_id = ? ");
+			queryUser.addParam(order_id);
+			ArtPayInfo artPayInfo = jdbcTemplate.findObject(queryUser,ArtPayInfo.class);
+			if(artPayInfo == null) {
+				throw new ServiceException("订单不存在");
 			}
 			
-			return unifiedorderResponse;
+			if(artPayInfo.getState() == 1) {
+				return 0;
+			}
+			
+			return 0;
 		}catch (Exception e) {
 			e.printStackTrace();
-			throw new ServiceException("统一下单失败："+e.getMessage());
+			throw new ServiceException("订单支付状态查询失败："+e.getMessage());
 		}
 	}
 	

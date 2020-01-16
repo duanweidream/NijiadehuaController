@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.nijiadehua.api.base.http.HttpClient;
+import com.nijiadehua.api.base.log.Logger;
 import com.nijiadehua.api.base.rest.Result;
 import com.nijiadehua.api.controller.v1.pay.response.NotifyResponse;
 import com.nijiadehua.api.controller.v1.pay.response.UnifiedorderResponse;
@@ -31,13 +32,15 @@ import net.sf.json.JSONObject;
 @RequestMapping(value="/v/1/pay")
 public class PayController{
 	
+	private static Logger log = Logger.getLogger("api");
+	
 	@Autowired
 	PayService payService;
 	
 	@ResponseBody
 	@RequestMapping(value="/unifiedorder",method=RequestMethod.POST)
 	public Result unifiedorder(@RequestBody String json,HttpServletRequest request) throws ServiceException{
-		
+		log.logInfo("[/v1/pay/unifiedorder]request:"+json);
 		if(StringUtil.isEmpty(json)){
 			return new Result(ApiError.Type.INVALID_PARAM.toException("参数错误!"));
 		}
@@ -50,9 +53,12 @@ public class PayController{
 			String ip = StringUtil.isEmpty(request.getHeader("remote_client_ip")) ? request.getRemoteAddr() : request.getHeader("remote_client_ip");
 			
 			UnifiedorderResponse unifiedorderResponse = payService.unifiedorder(user_id, ip, order_id);
+			
+			log.logInfo("[/v1/pay/unifiedorder]response:"+JSONObject.fromObject(unifiedorderResponse).toString());
 			return new Result(unifiedorderResponse);
 			
 		}catch (Exception e) {
+			log.logInfo("[/v1/pay/unifiedorder]error:"+e.getMessage());
 			return new Result(ApiError.Type.BUSINESS_ERROR.toException(e.getMessage()));
 		}
 		
@@ -70,12 +76,15 @@ public class PayController{
 	@ResponseBody
 	@RequestMapping(value="/notify",method=RequestMethod.POST,produces={"application/xml; charset=UTF-8"})
 	public NotifyResponse notify(@RequestBody String xml) throws Exception{
-		
+		log.logInfo("[/v1/pay/notify]request:"+xml);
 		try{
 			
-			return payService.notify(xml);
+			NotifyResponse notifyResponse = payService.notify(xml);
 			
+			log.logInfo("[/v1/pay/notify]request:"+JSONObject.fromObject(notifyResponse).toString());
+			return notifyResponse;
 		}catch (ServiceException e) {
+			log.logInfo("[/v1/pay/notify]error:"+e.getMessage());
 			NotifyResponse notifyResponse = new NotifyResponse();
 			notifyResponse.setReturn_code("FAIL");
 			notifyResponse.setReturn_msg(e.getMessage());
@@ -84,10 +93,23 @@ public class PayController{
 		
 	}
 	
-	public static void main(String[] args) {
+	@ResponseBody
+	@RequestMapping(value="/orderquery",method=RequestMethod.GET)
+	public Result orderquery(Long user_id,String order_id) throws ServiceException{
 		
-		StringBuffer xml = new StringBuffer("<?xml version=\"1.0\" encoding=\"UTF-8\"?><xml><id>1</id><name>xxl</name><age>24</age></xml>");
-		HttpClient.postXmlString("http://localhost:8080/v/1/pay/notify", xml.toString(), null);
+		if(StringUtil.isEmpty(user_id,order_id)){
+			return new Result(ApiError.Type.INVALID_PARAM.toException("参数错误!"));
+		}
+		
+		try{
+		
+			int result = payService.queryOrderPayStatus(user_id, order_id);
+			
+			return new Result(result);
+			
+		}catch (Exception e) {
+			return new Result(ApiError.Type.BUSINESS_ERROR.toException(e.getMessage()));
+		}
 		
 	}
 	

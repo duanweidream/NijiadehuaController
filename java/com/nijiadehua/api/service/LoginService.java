@@ -6,6 +6,7 @@ import com.nijiadehua.api.base.db.Sql;
 import com.nijiadehua.api.base.log.Logger;
 import com.nijiadehua.api.base.wechat.WeChatApi;
 import com.nijiadehua.api.controller.v1.login.request.LoginRequest;
+import com.nijiadehua.api.controller.v1.login.request.LoginRequest.User;
 import com.nijiadehua.api.controller.v1.login.response.LoginResponse;
 import com.nijiadehua.api.exception.ServiceException;
 import com.nijiadehua.api.util.JsonUtil;
@@ -44,25 +45,44 @@ public class LoginService {
 			}
 			String openid = authInfo.getString("openid");
 			
-			
-			Sql sql = new Sql("insert into art_user_info (`wx_name`,`wx_img`,`wx_sex`,`open_id`,`phone`,`identity`,`login_count`,`create_time`,`first_login_time`,`last_login_time`)");
-			sql.append("values (?,?,?,?,?,?,?,?,?,?) ");
-			sql.append("on duplicate key update `wx_name`=?,`wx_img`=?,`wx_sex`=?,`phone`=?,`login_count`=`login_count`+1,`last_login_time`=?");
-			sql.addParam(loginRequest.getUser().getWx_name(),loginRequest.getUser().getWx_img(),loginRequest.getUser().getWx_sex(),openid,loginRequest.getUser().getPhone(),1,1,currentTime,currentTime,currentTime);
-			sql.addParam(loginRequest.getUser().getWx_name(),loginRequest.getUser().getWx_img(),loginRequest.getUser().getWx_sex(),loginRequest.getUser().getPhone(),currentTime);
-			int result = jdbcTemplate.updateObject(sql);
-			if(result == 0) {
-				throw new ServiceException("数据执行错误");
-			}
-			
 			Sql queryUser = new Sql(" select * from art_user_info where open_id = ? ");
 			queryUser.addParam(openid);
 			LoginResponse loginResponse = jdbcTemplate.findObject(queryUser, LoginResponse.class);
-			if(loginResponse == null) {
-				throw new ServiceException("用户信息查询错误");
-			}
 			
-			return loginResponse;
+			User user = loginRequest.getUser();
+			if(loginResponse == null) {
+				Sql sql = new Sql("insert into art_user_info (`wx_name`,`wx_img`,`wx_sex`,`open_id`,`phone`,`identity`,`login_count`,`create_time`,`first_login_time`,`last_login_time`)");
+				sql.append("values (?,?,?,?,?,?,?,?,?,?) ");
+				sql.addParam(user.getWx_name(),user.getWx_img(),user.getWx_sex(),openid,user.getPhone(),1,1,currentTime,currentTime,currentTime);
+				Long id = jdbcTemplate.saveObject(sql);
+				if(id == null) {
+					throw new ServiceException("数据执行错误");
+				}
+				
+				loginResponse = new LoginResponse();
+				loginResponse.setWx_id(id);
+				loginResponse.setWx_name(user.getWx_name());
+				loginResponse.setWx_img(user.getWx_img());
+				loginResponse.setWx_sex(user.getWx_sex());
+				loginResponse.setPhone(user.getPhone());
+				return loginResponse;
+			}else {
+				Sql sql = new Sql(" update art_user_info set `wx_name`=?,`wx_img`=?,`wx_sex`=?,`phone`=?,`login_count`=`login_count`+1,`last_login_time`=?");
+				sql.addParam(loginRequest.getUser().getWx_name(),loginRequest.getUser().getWx_img(),loginRequest.getUser().getWx_sex(),loginRequest.getUser().getPhone(),currentTime);
+				int result = jdbcTemplate.updateObject(sql);
+				if(result == 0) {
+					throw new ServiceException("数据执行错误");
+				}
+				
+				loginResponse.setWx_id(loginResponse.getWx_id());
+				loginResponse.setWx_name(user.getWx_name());
+				loginResponse.setWx_img(user.getWx_img());
+				loginResponse.setWx_sex(user.getWx_sex());
+				loginResponse.setPhone(user.getPhone());
+				return loginResponse;
+				
+			}
+		
 		}catch (Exception e) {
 			e.printStackTrace();
 			log.logError("登录失败",e);
@@ -70,13 +90,7 @@ public class LoginService {
 		}
 		
 	}
-	
-	
-	public static void main(String[] args) {
-		
-		
-	}
-	
+
 	
 	
 }
