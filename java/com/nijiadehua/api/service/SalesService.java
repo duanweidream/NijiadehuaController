@@ -7,6 +7,7 @@ import com.nijiadehua.api.base.db.JdbcTemplate;
 import com.nijiadehua.api.base.db.Sql;
 import com.nijiadehua.api.controller.v1.sales.response.DetailResponse;
 import com.nijiadehua.api.controller.v1.sales.response.SalesAttrResponse;
+import com.nijiadehua.api.controller.v1.sales.response.SalesAttrResponse.Attr;
 import com.nijiadehua.api.controller.v1.sales.response.SalesAttrResponse;
 import com.nijiadehua.api.controller.v1.sales.response.SalesValueResponse;
 import com.nijiadehua.api.controller.v1.sales.response.SearchResponse;
@@ -27,19 +28,19 @@ public class SalesService {
 
 	private JdbcTemplate jdbcTemplate = new JdbcTemplate();
 	
-	public void searchSalesForPage(Page page,String sort_id) throws ApiError{
+	public void searchSalesForPage(Page page,String sort_code) throws ApiError{
 		Sql sql = new Sql(" select a.sales_id,c.sort_code,c.sort_short_name,c.sort_long_name,a.sales_name,a.sales_title,e.artist_name art_name,a.sales_price,a.mkt_price,d.img_url sales_img ");
 		sql.append(" from art_sales_info a,art_sales_sort b,art_sort c,art_sales_img d,artist_info e ");
 		sql.append(" where a.sales_id = b.sales_id and b.sort_id = c.id and a.sales_id = d.sales_id and a.artist_id = e.id and d.img_sort = 1 and a.sales_status = 1 and a.sales_home = 1 ");
-		if(!StringUtil.isEmpty(sort_id)){
-			sql.append("and", "b.sort_id", "=", sort_id);
+		if(!StringUtil.isEmpty(sort_code)){
+			sql.append("and", "c.sort_code", "=", sort_code);
 		}
 		sql.append(" order by a.modify_time desc ");
 		jdbcTemplate.search(page, sql,SearchResponse.class);
 	}
 	
 	public DetailResponse findSalesBySalesId(Long sales_id) throws ApiError{
-		Sql sql = new Sql(" select a.sales_id,c.sort_code,c.sort_short_name,c.sort_long_name,a.sales_name,a.sales_title sales_title,d.artist_name art_name,a.sales_price,a.mkt_price  ");
+		Sql sql = new Sql(" select a.sales_id,c.sort_code,c.sort_short_name,c.sort_long_name,a.sales_name,a.sales_title sales_title,d.id as art_id,d.artist_name art_name,a.sales_price,a.mkt_price  ");
 		sql.append(" from art_sales_info a,art_sales_sort b,art_sort c ,artist_info d ");
 		sql.append(" where a.sales_id = b.sales_id and b.sort_id = c.id and a.sales_id = b.sales_id and a.artist_id = d.id and a.sales_status = 1 and a.sales_id = ? ");
 		sql.append(" order by a.modify_time desc ");
@@ -70,29 +71,34 @@ public class SalesService {
 	
 	public List<SalesAttrResponse> findSalesAttrBySalesId(Long sales_id) throws ServiceException{
 		try {
-			Sql sql = new Sql(" SELECT c.attr_id,c.attr_name ");
+			Sql sql = new Sql(" SELECT c.attr_id,c.attr_name,a.product_id ");
 			sql.append(" FROM art_sales_info a,art_prod_info b,art_attribute c  ");
 			sql.append(" where a.product_id = b.product_id and b.sort_id = c.attr_sort and a.sales_id = ? ");
 			sql.addParam(sales_id);
-			List<SalesAttrResponse> attrList = jdbcTemplate.queryForList(sql,SalesAttrResponse.class);
+			List<Attr> attrList = jdbcTemplate.queryForList(sql,Attr.class);
 			if(attrList == null || attrList.size() == 0) {
 				throw new ServiceException("查询销售品SKU属性错误");
 			}
 			
-			for(SalesAttrResponse attr : attrList) {
+			List<SalesAttrResponse> attrs = new ArrayList<SalesAttrResponse>();
+			for(Attr attr : attrList) {
+				SalesAttrResponse salesAttrResponse = new SalesAttrResponse();
 				
-				Sql valueSql = new Sql(" SELECT id value_id,attr_value value_name from art_attribute_value where attr_id = ? ");
-				valueSql.addParam(attr.getAttr_id());
+				Sql valueSql = new Sql(" select c.id value_id,c.attr_value value_name from art_prod_sku a,art_prod_sku_item b,art_attribute_value c where a.sku_id = b.sku_id and b.attr_value_id = c.id and a.product_id = ? and c.attr_id = ?  ");
+				valueSql.addParam(attr.getProduct_id(),attr.getAttr_id());
 				
 				List<SalesValueResponse> valueList = jdbcTemplate.queryForList(valueSql,SalesValueResponse.class);
 				if(valueList == null || valueList.size() == 0) {
 					throw new ServiceException("查询销售品SKU属性值错误");
 				}
-				attr.setValues(valueList);
 				
+				salesAttrResponse.setAttr_id(attr.getAttr_id());
+				salesAttrResponse.setAttr_name(attr.getAttr_name());
+				salesAttrResponse.setValues(valueList);
+				attrs.add(salesAttrResponse);
 			}
 			
-			return attrList;
+			return attrs;
 		}catch (Exception e) {
 			throw new ServiceException("查询销售品SKU属性错误："+e.getMessage());
 		}

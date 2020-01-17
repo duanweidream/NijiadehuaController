@@ -26,21 +26,21 @@ public class PayService {
 	public UnifiedorderResponse unifiedorder(Long user_id,String ip,String order_id) throws ServiceException{
 		try {
 			UnifiedorderResponse unifiedorderResponse = new UnifiedorderResponse();
-			
-			Sql queryUser = new Sql(" select open_id from art_user_info where user_id = ? ");
+		
+			Sql queryUser = new Sql(" select open_id from art_user_info where wx_id = ? ");
 			queryUser.addParam(user_id);
 			String openid = jdbcTemplate.findForString(queryUser);
 			if(StringUtil.isEmpty(openid)) {
 				throw new ServiceException("用户信息查询错误");
 			}
-			
+			System.out.println("1111111111");
 			Sql queryOrder = new Sql(" select a.pay_amount,b.sales_name,b.sku_name from art_order_info a,art_order_goods b where a.order_id = b.order_id and a.order_status = 1 and a.order_id = ? and a.user_id = ? ");
-			queryOrder.addParam(order_id);
+			queryOrder.addParam(order_id,user_id);
 			List<ArtOrderInfo> orderInfo = jdbcTemplate.queryForList(queryOrder,ArtOrderInfo.class);
 			if(orderInfo.size() == 0) {
 				throw new ServiceException("订单信息查询错误");
 			}
-			
+			System.out.println("222222222");
 			double pay_amount = 0;
 			String goods = "";
 			for(ArtOrderInfo good : orderInfo) {
@@ -56,7 +56,7 @@ public class PayService {
 			if(!unifiedorder.containsKey("prepay_id") || StringUtil.isEmpty(unifiedorder.get("prepay_id"))) {
 				throw new ServiceException("调用微信接口错误");
 			}
-			
+			System.out.println("33333333");
 			String timeStamp = System.currentTimeMillis()+"";
 			String nonceStr = Sha1Util.getNonceStr();
 			String prepay_id = unifiedorder.get("prepay_id");
@@ -64,11 +64,11 @@ public class PayService {
 			
 			Date current_time = new Date();
 			
-			Sql queryPaySql = new Sql(" select * from art_pay_ifo where order_id = ? ");
+			Sql queryPaySql = new Sql(" select * from art_pay_info where order_id = ? ");
 			queryPaySql.addParam(order_id);
 			ArtPayInfo artPayInfo = jdbcTemplate.findObject(queryPaySql, ArtPayInfo.class);
 			if(artPayInfo == null) {
-				Sql savePaySql = new Sql(" insert into art_pay_ifo (order_id,prepay_id,order_amount,state,create_time,update_time) values (?,?,?,?,?,?,?) ");
+				Sql savePaySql = new Sql(" insert into art_pay_info (order_id,prepay_id,order_amount,state,create_time,update_time) values (?,?,?,?,?,?) ");
 				savePaySql.addParam(order_id,prepay_id,pay_amount,0,current_time,current_time);
 				Long result = jdbcTemplate.saveObject(savePaySql);
 				if(result == null) {
@@ -76,14 +76,14 @@ public class PayService {
 				}
 				
 			}else {
-				Sql updatePaySql = new Sql(" update art_pay_ifo set prepay_id=?,update_time=? where order_id = ? ");
+				Sql updatePaySql = new Sql(" update art_pay_info set prepay_id=?,update_time=? where order_id = ? ");
 				updatePaySql.addParam(order_id);
 				int result = jdbcTemplate.updateObject(updatePaySql);
 				if(result == 0) {
 					throw new ServiceException("更新统一订单信息失败");
 				}
 			}
-			
+			System.out.println("444444");
 			
 			Map<String, String> data = new HashMap<String,String>();
 			data.put("timeStamp", timeStamp);
@@ -91,7 +91,7 @@ public class PayService {
 			data.put("prepay_id", prepay_id);
 			data.put("signType", signType);
 			String paySign = MiniPayUtil.generateSignature(data);
-			
+			System.out.println("5555555555");
 			unifiedorderResponse.setTimeStamp(timeStamp);
 			unifiedorderResponse.setNonceStr(nonceStr);
 			unifiedorderResponse.setPrepay_id(prepay_id);
@@ -145,7 +145,7 @@ public class PayService {
 			if(artPayInfo == null) {
 				//微信通知错误，为找到统一支付订单
 				notifyResponse.setReturn_code("FAIL");
-				notifyResponse.setReturn_msg("为找到统一支付订单");
+				notifyResponse.setReturn_msg("未找到统一支付订单");
 				return notifyResponse;
 			}
 			
@@ -179,6 +179,13 @@ public class PayService {
 				throw new ServiceException("业务失败：更新订单信息出错");
 			}
 			
+			Sql outbount = new Sql(" update art_stock_outbound set out_type = ?,modify_time = ?,remark = ? where order_id = ? ");
+			outbount.addParam(2,current_time,"订单支付完成",out_trade_no);
+			int outbount_result = jdbcTemplate.updateObject(outbount);
+			if(outbount_result == 0) {
+				throw new ServiceException("订单号【"+out_trade_no+"】实际扣减库存失败");
+			}
+			
 			notifyResponse.setReturn_code("SUCCESS");
 			notifyResponse.setReturn_msg("支付通知成功");
 			return notifyResponse;
@@ -200,7 +207,7 @@ public class PayService {
 			}
 			
 			if(artPayInfo.getState() == 1) {
-				return 0;
+				return 1;
 			}
 			
 			return 0;

@@ -191,8 +191,8 @@ public class OrderService {
 				}
 				
 				
-				Sql outbount = new Sql(" insert into art_stock_outbound (product_id,sku_id,out_stock,out_type,remark,valid,create_time,modify_time) values (?,?,?,?,?,?,?,?) ");
-				outbount.addParam(salesInfo[1],good.getSku_id(),good.getQty(),1,good.getOrder_id(),1,current_time,current_time);
+				Sql outbount = new Sql(" insert into art_stock_outbound (product_id,sku_id,out_stock,out_type,order_id,remark,valid,create_time,modify_time) values (?,?,?,?,?,?,?,?,?) ");
+				outbount.addParam(salesInfo[1],good.getSku_id(),good.getQty(),1,good.getOrder_id(),"订单提交完成",1,current_time,current_time);
 				Long out_id = jdbcTemplate.saveObject(outbount);
 				if(out_id == null) {
 					throw new ServiceException("销售品【"+good.getSales_id()+"】扣减库存失败");
@@ -297,9 +297,39 @@ public class OrderService {
 		}
 	}
 	
-	public static void main(String[] args) {
-		
 	
+	public int cancelOrder(Long user_id,String order_id) throws ServiceException{
+		try {
+			Sql sql = new Sql(" select user_id,order_id,order_status,order_amount,pay_amount,order_remark,DATE_FORMAT(create_time,'%Y-%m-%d %H:%i:%s') create_time,delivery_mode,delivery_name,delivery_phone,delivery_address,delivery_send,express_company,express_number,express_freight from art_order_info where order_id = ? and user_id = ? ");
+			sql.addParam(order_id,user_id);
+			
+			OrderDetailResponse order = jdbcTemplate.findObject(sql, OrderDetailResponse.class);
+			if(order == null || order.getOrder_status().intValue() != 1) {
+				throw new ServiceException("订单【"+order_id+"】不存在");
+			}
+			
+			Date current_time = new Date();
+			
+			Sql outbount = new Sql(" update art_stock_outbound set remark = ?,valid = ?,modify_time = ? where order_id = ? ");
+			outbount.addParam("订单取消完成",0,current_time,order_id);
+			int out_result = jdbcTemplate.updateObject(outbount);
+			if(out_result == 0) {
+				throw new ServiceException("订单号【"+order_id+"】扣减库存失败");
+			}
+			
+			Sql sku = new Sql(" update art_prod_sku set sku_stock = ?,modify_time = ? where sku_id = ? ");
+			//sku.addParam(stock - good.getQty(),current_time,good.getSku_id());
+			int sku_result = jdbcTemplate.updateObject(sku);
+			if(sku_result == 0) {
+				throw new ServiceException("订单号【"+order_id+"】扣减库存失败");
+			}
+			
+			
+			return 1;
+		}catch(Exception e) {
+			log.logError("订单取消错误", e);
+			throw new ServiceException("订单取消错误："+e.getMessage());
+		}
 	}
 	
 	

@@ -96,7 +96,7 @@ public class PayController{
 	@ResponseBody
 	@RequestMapping(value="/orderquery",method=RequestMethod.GET)
 	public Result orderquery(Long user_id,String order_id) throws ServiceException{
-		log.logInfo("[/v1/pay/notify]request:user_id:"+user_id+",order_id:"+order_id);
+		log.logInfo("[/v1/pay/orderquery]request:user_id:"+user_id+",order_id:"+order_id);
 		if(StringUtil.isEmpty(user_id,order_id)){
 			return new Result(ApiError.Type.INVALID_PARAM.toException("参数错误!"));
 		}
@@ -105,11 +105,11 @@ public class PayController{
 		
 			int result = payService.queryOrderPayStatus(user_id, order_id);
 			
-			log.logInfo("[/v1/pay/notify]response:"+result);
+			log.logInfo("[/v1/pay/orderquery]response:"+result);
 			return new Result(result);
 			
 		}catch (Exception e) {
-			log.logInfo("[/v1/pay/notify]error:"+e.getMessage());
+			log.logInfo("[/v1/pay/orderquery]error:"+e.getMessage());
 			return new Result(ApiError.Type.BUSINESS_ERROR.toException(e.getMessage()));
 		}
 		

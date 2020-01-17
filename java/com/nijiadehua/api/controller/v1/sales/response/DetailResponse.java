@@ -10,6 +10,7 @@ public class DetailResponse {
 	private String sort_short_name;
 	private String sort_long_name;
 	private String sales_name;
+	private Long art_id;
 	private String art_name;
 	private String sales_title;
 	private Double sales_price;
@@ -44,6 +45,14 @@ public class DetailResponse {
 	}
 	public void setSales_name(String sales_name) {
 		this.sales_name = sales_name;
+	}
+	
+	
+	public Long getArt_id() {
+		return art_id;
+	}
+	public void setArt_id(Long art_id) {
+		this.art_id = art_id;
 	}
 	public String getArt_name() {
 		return art_name;

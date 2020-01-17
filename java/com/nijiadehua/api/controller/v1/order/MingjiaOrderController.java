@@ -131,7 +131,7 @@ public class MingjiaOrderController{
 	
 	@ResponseBody
 	@RequestMapping(value="/cancel",method=RequestMethod.GET)
-	public Result cancel(String user_id,String order_id) throws ServiceException{
+	public Result cancel(Long user_id,String order_id) throws ServiceException{
 		
 		if(StringUtil.isEmpty(user_id,order_id)){
 			return new Result(ApiError.Type.INVALID_PARAM.toException("参数错误!"));
@@ -139,7 +139,7 @@ public class MingjiaOrderController{
 		
 		try{
 			
-			//orderService.cancel(json);
+			orderService.cancelOrder(user_id, order_id);
 			
 			return new Result();
 		}catch (Exception e) {

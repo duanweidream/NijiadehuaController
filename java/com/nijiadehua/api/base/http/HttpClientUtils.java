@@ -198,12 +198,12 @@ public class HttpClientUtils {
 	            con.setRequestProperty("Pragma:", "no-cache");
 	            con.setRequestProperty("Cache-Control", "no-cache");
 	            con.setRequestProperty("Content-Type", "text/xml");
-
+	            
 	            OutputStreamWriter out = new OutputStreamWriter(con.getOutputStream());    
-	            out.write(new String(xmlInfo.getBytes("ISO-8859-1")));
+	            out.write(new String(xmlInfo.getBytes("utf-8")));
 	            out.flush();
 	            out.close();
-	            BufferedReader br = new BufferedReader(new InputStreamReader(con.getInputStream()));
+	            BufferedReader br = new BufferedReader(new InputStreamReader(con.getInputStream(),"utf-8"));
 	            StringBuffer sbuf = new StringBuffer();
 	            String line = "";
 	            for (line = br.readLine(); line != null; line = br.readLine()) {

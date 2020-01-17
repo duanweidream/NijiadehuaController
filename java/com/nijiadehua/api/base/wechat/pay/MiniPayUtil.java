@@ -40,7 +40,7 @@ public class MiniPayUtil {
 		map.put("mch_id", MCH_ID);
 		map.put("openid", openid);
 		map.put("nonce_str", Sha1Util.getNonceStr());
-		map.put("body", new String(goods.getBytes("utf-8")));
+		map.put("body", goods);
 		map.put("out_trade_no", order_id); //商户系统内部订单号，要求32个字符内
 		map.put("total_fee", amount+""); //标价金额,标价金额
 		map.put("spbill_create_ip", ip); //终端IP,调用微信支付API的机器IP
@@ -181,7 +181,7 @@ public class MiniPayUtil {
 		//System.out.println(responseXml);
 		//Map<String,String> map = unifiedorder("https://api.mch.weixin.qq.com/pay/unifiedorder", "oDjJa5JcnGyPCnQEP_XDesqX-W1U", "223.202.209.6");
 		//System.out.println(map);
-		Map<String,String> map = unifiedorder("oDjJa5JcnGyPCnQEP_XDesqX-W1U", "223.202.209.6","DZ20190528160609934632","test",1);
+		Map<String,String> map = unifiedorder("oDjJa5JcnGyPCnQEP_XDesqX-W1U", "223.202.209.6","DZ20190528160609934633","test哈哈",1);
 		System.out.println(map);
 	}
 	

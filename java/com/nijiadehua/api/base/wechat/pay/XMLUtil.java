@@ -45,7 +45,7 @@ public class XMLUtil {
 			return null;
 		}
 		Map<String,String> m = new HashMap<String,String>();
-		InputStream in = new ByteArrayInputStream(strxml.getBytes());
+		InputStream in = new ByteArrayInputStream(strxml.getBytes("utf-8"));
 		SAXBuilder builder = new SAXBuilder();
 		Document doc = builder.build(in);
 		Element root = doc.getRootElement();
