@@ -10,7 +10,6 @@ import com.nijiadehua.api.base.http.HttpClientUtils;
 import com.nijiadehua.api.base.log.Logger;
 import com.nijiadehua.api.util.MD5Util;
 
-import sun.security.jgss.spi.MechanismFactory;
 
 //微信支付工具类
 public class MiniPayUtil {
@@ -35,6 +34,11 @@ public class MiniPayUtil {
     public static Map<String,String> unifiedorder(String openid,String ip,String order_id,String goods,int amount) throws Exception{
     	String url = "https://api.mch.weixin.qq.com/pay/unifiedorder";
     	
+    	System.out.println("openid:"+openid);
+    	System.out.println("ip:"+ip);
+    	System.out.println("order_id:"+order_id);
+    	System.out.println("goods:"+goods);
+    	System.out.println("amount:"+amount);
 		SortedMap<String, String> map = new TreeMap<String, String>();
 		map.put("appid", APP_ID);
 		map.put("mch_id", MCH_ID);
@@ -49,6 +53,7 @@ public class MiniPayUtil {
 		map.put("sign", generateSignature(map, MCH_SECRET));
 		
 		String xml = XMLUtil.mapToXml(map);
+		System.out.println("xml:"+xml);
 		String responseXml = HttpClientUtils.postXml(url,xml);
 		
         String return_code;
@@ -181,7 +186,7 @@ public class MiniPayUtil {
 		//System.out.println(responseXml);
 		//Map<String,String> map = unifiedorder("https://api.mch.weixin.qq.com/pay/unifiedorder", "oDjJa5JcnGyPCnQEP_XDesqX-W1U", "223.202.209.6");
 		//System.out.println(map);
-		Map<String,String> map = unifiedorder("oDjJa5JcnGyPCnQEP_XDesqX-W1U", "223.202.209.6","DZ20190528160609934633","test哈哈",1);
+		Map<String,String> map = unifiedorder("oDjJa5FaFCXh6EMI_YCF_OmMQrJQ", "223.202.209.6","20200118183800000059","勤奋 勤奋 50X100cm",1);
 		System.out.println(map);
 	}
 	

@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.nijiadehua.api.base.rest.Result;
 import com.nijiadehua.api.controller.v1.sales.response.DetailResponse;
+import com.nijiadehua.api.controller.v1.sales.response.DetailResponse.Img;
 import com.nijiadehua.api.controller.v1.sales.response.SalesAttrResponse;
 import com.nijiadehua.api.controller.v1.sales.response.SearchResponse;
 import com.nijiadehua.api.exception.ApiError;

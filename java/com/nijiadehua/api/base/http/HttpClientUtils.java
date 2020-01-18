@@ -195,8 +195,9 @@ public class HttpClientUtils {
 	            URL url = new URL(uri);
 	            URLConnection con = url.openConnection();
 	            con.setDoOutput(true);
-	            con.setRequestProperty("Pragma:", "no-cache");
-	            con.setRequestProperty("Cache-Control", "no-cache");
+	            //jdk1.8不需要加
+	            //con.setRequestProperty("Pragma:", "no-cache");
+	            //con.setRequestProperty("Cache-Control", "no-cache");
 	            con.setRequestProperty("Content-Type", "text/xml");
 	            
 	            OutputStreamWriter out = new OutputStreamWriter(con.getOutputStream());    

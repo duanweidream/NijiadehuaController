@@ -44,7 +44,7 @@ public class PayService {
 			double pay_amount = 0;
 			String goods = "";
 			for(ArtOrderInfo good : orderInfo) {
-				goods += good;
+				goods += good.getSales_name()+" "+good.getSku_name();
 				pay_amount = good.getPay_amount();
 			}
 			
@@ -52,7 +52,7 @@ public class PayService {
 			//{result_code=FAIL, sign=585F6938CA28E929A62860F967649201, mch_id=1573616051, err_code=INVALID_REQUEST, err_code_des=201 商户订单号重复, return_msg=OK, appid=wx6e2a2a319598b1e5, nonce_str=aTvboqJRyqgxuLX5, return_code=SUCCESS}
 			//{result_code=SUCCESS, sign=37363EE7B96A5432B9D447564D724F10, mch_id=1573616051, prepay_id=wx1319002573923303ad89e9881683799500, return_msg=OK, appid=wx6e2a2a319598b1e5, nonce_str=8vuZBLOdZOgamfzi, return_code=SUCCESS, trade_type=JSAPI}
 			int amount = (int)(pay_amount*100);
-			Map<String,String> unifiedorder = MiniPayUtil.unifiedorder(openid, ip, order_id, goods, amount);
+			Map<String,String> unifiedorder = MiniPayUtil.unifiedorder(openid, ip, order_id, "test123", amount);
 			if(!unifiedorder.containsKey("prepay_id") || StringUtil.isEmpty(unifiedorder.get("prepay_id"))) {
 				throw new ServiceException("调用微信接口错误");
 			}

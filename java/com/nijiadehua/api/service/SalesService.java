@@ -6,6 +6,7 @@ import java.util.List;
 import com.nijiadehua.api.base.db.JdbcTemplate;
 import com.nijiadehua.api.base.db.Sql;
 import com.nijiadehua.api.controller.v1.sales.response.DetailResponse;
+import com.nijiadehua.api.controller.v1.sales.response.DetailResponse.Img;
 import com.nijiadehua.api.controller.v1.sales.response.SalesAttrResponse;
 import com.nijiadehua.api.controller.v1.sales.response.SalesAttrResponse.Attr;
 import com.nijiadehua.api.controller.v1.sales.response.SalesAttrResponse;
@@ -49,20 +50,23 @@ public class SalesService {
 	}
 	
 	public List<String> findSalesImgBySalesId(Long sales_id) throws ApiError{
-		
 		List<String> result = new ArrayList<String>();
 		
+		
 		Sql sql = new Sql(" select img_url from art_sales_img where sales_id = ? ");
-		sql.append(" order by img_sort desc ");
+		sql.append(" order by img_sort ");
 		sql.addParam(sales_id);
-		Object[] array = jdbcTemplate.findForArray(sql);
-		if(array != null) {
-			for(Object o : array) {
-				if(!StringUtil.isEmpty(o)) {
-					result.add(o.toString());
-				}
+		List<Img> array = jdbcTemplate.queryForList(sql, Img.class);
+		
+		if(array.size() > 0) {
+			for(Img img : array) {
+				
+				result.add(img.getImg_url());
+				
 			}
+			
 		}
+		
 		
 		return result;
 		
