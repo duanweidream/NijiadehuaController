@@ -5,11 +5,10 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.stereotype.Service;
-
+import com.github.wxpay.sdk.WXPayUtil;
 import com.nijiadehua.api.base.db.JdbcTemplate;
 import com.nijiadehua.api.base.db.Sql;
 import com.nijiadehua.api.base.wechat.pay.MiniPayUtil;
-import com.nijiadehua.api.base.wechat.pay.Sha1Util;
 import com.nijiadehua.api.base.wechat.pay.XMLUtil;
 import com.nijiadehua.api.controller.v1.pay.response.ArtOrderInfo;
 import com.nijiadehua.api.controller.v1.pay.response.ArtPayInfo;
@@ -33,18 +32,18 @@ public class PayService {
 			if(StringUtil.isEmpty(openid)) {
 				throw new ServiceException("用户信息查询错误");
 			}
-			System.out.println("1111111111");
+			
 			Sql queryOrder = new Sql(" select a.pay_amount,b.sales_name,b.sku_name from art_order_info a,art_order_goods b where a.order_id = b.order_id and a.order_status = 1 and a.order_id = ? and a.user_id = ? ");
 			queryOrder.addParam(order_id,user_id);
 			List<ArtOrderInfo> orderInfo = jdbcTemplate.queryForList(queryOrder,ArtOrderInfo.class);
 			if(orderInfo.size() == 0) {
 				throw new ServiceException("订单信息查询错误");
 			}
-			System.out.println("222222222");
+			
 			double pay_amount = 0;
 			String goods = "";
 			for(ArtOrderInfo good : orderInfo) {
-				goods += good.getSales_name()+" "+good.getSku_name();
+				goods += good.getSales_name();
 				pay_amount = good.getPay_amount();
 			}
 			
@@ -52,13 +51,13 @@ public class PayService {
 			//{result_code=FAIL, sign=585F6938CA28E929A62860F967649201, mch_id=1573616051, err_code=INVALID_REQUEST, err_code_des=201 商户订单号重复, return_msg=OK, appid=wx6e2a2a319598b1e5, nonce_str=aTvboqJRyqgxuLX5, return_code=SUCCESS}
 			//{result_code=SUCCESS, sign=37363EE7B96A5432B9D447564D724F10, mch_id=1573616051, prepay_id=wx1319002573923303ad89e9881683799500, return_msg=OK, appid=wx6e2a2a319598b1e5, nonce_str=8vuZBLOdZOgamfzi, return_code=SUCCESS, trade_type=JSAPI}
 			int amount = (int)(pay_amount*100);
-			Map<String,String> unifiedorder = MiniPayUtil.unifiedorder(openid, ip, order_id, "test123", amount);
+			Map<String,String> unifiedorder = MiniPayUtil.unifiedorder(openid, ip,order_id,goods,amount);
 			if(!unifiedorder.containsKey("prepay_id") || StringUtil.isEmpty(unifiedorder.get("prepay_id"))) {
 				throw new ServiceException("调用微信接口错误");
 			}
-			System.out.println("33333333");
-			String timeStamp = System.currentTimeMillis()+"";
-			String nonceStr = Sha1Util.getNonceStr();
+			
+			String timeStamp = WXPayUtil.getCurrentTimestamp() + "";
+			String nonceStr = WXPayUtil.generateNonceStr();
 			String prepay_id = unifiedorder.get("prepay_id");
 			String signType = "MD5";
 			
@@ -77,24 +76,25 @@ public class PayService {
 				
 			}else {
 				Sql updatePaySql = new Sql(" update art_pay_info set prepay_id=?,update_time=? where order_id = ? ");
-				updatePaySql.addParam(order_id);
+				updatePaySql.addParam(prepay_id,current_time,order_id);
 				int result = jdbcTemplate.updateObject(updatePaySql);
 				if(result == 0) {
 					throw new ServiceException("更新统一订单信息失败");
 				}
 			}
-			System.out.println("444444");
 			
 			Map<String, String> data = new HashMap<String,String>();
+			data.put("appId", MiniPayUtil.APP_ID);
 			data.put("timeStamp", timeStamp);
 			data.put("nonceStr", nonceStr);
-			data.put("prepay_id", prepay_id);
+			data.put("package", "prepay_id="+prepay_id);
 			data.put("signType", signType);
-			String paySign = MiniPayUtil.generateSignature(data);
-			System.out.println("5555555555");
+			String paySign = WXPayUtil.generateSignature(data,MiniPayUtil.MCH_SECRET);
+			
+			unifiedorderResponse.setAppId(data.get("appId"));
 			unifiedorderResponse.setTimeStamp(timeStamp);
 			unifiedorderResponse.setNonceStr(nonceStr);
-			unifiedorderResponse.setPrepay_id(prepay_id);
+			unifiedorderResponse.setPrepay_id(data.get("package"));
 			unifiedorderResponse.setSignType(signType);
 			unifiedorderResponse.setPaySign(paySign);
 			return unifiedorderResponse;
@@ -131,7 +131,7 @@ public class PayService {
 				
 			}
 			
-			if(!MiniPayUtil.isSignatureValid(notify)) {
+			if(!WXPayUtil.isSignatureValid(notify,MiniPayUtil.MCH_SECRET)) {
 				notifyResponse.setReturn_code("FAIL");
 				notifyResponse.setReturn_msg("签名错误");
 				return notifyResponse;
@@ -139,7 +139,7 @@ public class PayService {
 			
 			//是否已经接收过通知
 			String out_trade_no = notify.get("out_trade_no");
-			Sql queryPaySql = new Sql(" select * from art_pay_ifo where order_id = ? ");
+			Sql queryPaySql = new Sql(" select * from art_pay_info where order_id = ? ");
 			queryPaySql.addParam(out_trade_no);
 			ArtPayInfo artPayInfo = jdbcTemplate.findObject(queryPaySql, ArtPayInfo.class);
 			if(artPayInfo == null) {
@@ -165,14 +165,14 @@ public class PayService {
 			
 			Date current_time = new Date();
 			
-			Sql updatePaySql = new Sql(" update art_pay_ifo set transaction_id = ?,state = ?,update_time = ? where order_id = ? ");
+			Sql updatePaySql = new Sql(" update art_pay_info set transaction_id = ?,state = ?,update_time = ? where order_id = ? ");
 			updatePaySql.addParam(transaction_id,1,current_time,out_trade_no);
 			int updatePay = jdbcTemplate.updateObject(updatePaySql);
 			if(updatePay == 0) {
 				throw new ServiceException("业务失败：更新支付信息出错");
 			}
 			
-			Sql updateOrderSql = new Sql(" update art_order_ifo set pay_time = ?,order_status = ?,update_time = ? where order_id = ? ");
+			Sql updateOrderSql = new Sql(" update art_order_info set pay_time = ?,order_status = ?,update_time = ? where order_id = ? ");
 			updateOrderSql.addParam(current_time,2,current_time,out_trade_no);
 			int updateOrder = jdbcTemplate.updateObject(updateOrderSql);
 			if(updateOrder == 0) {

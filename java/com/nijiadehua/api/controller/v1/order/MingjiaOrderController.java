@@ -140,7 +140,24 @@ public class MingjiaOrderController{
 		try{
 			
 			orderService.cancelOrder(user_id, order_id);
+			return new Result();
+		}catch (Exception e) {
+			return new Result(ApiError.Type.BUSINESS_ERROR.toException(e.getMessage()));
+		}
+		
+	}
+	
+	@ResponseBody
+	@RequestMapping(value="/confirm",method=RequestMethod.GET)
+	public Result confirm(Long user_id,String order_id) throws ServiceException{
+		
+		if(StringUtil.isEmpty(user_id,order_id)){
+			return new Result(ApiError.Type.INVALID_PARAM.toException("参数错误!"));
+		}
+		
+		try{
 			
+			orderService.confirmOrder(user_id, order_id);
 			return new Result();
 		}catch (Exception e) {
 			return new Result(ApiError.Type.BUSINESS_ERROR.toException(e.getMessage()));

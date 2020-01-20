@@ -1,12 +1,22 @@
 package com.nijiadehua.api.controller.v1.pay.response;
 
 public class UnifiedorderResponse {
-
+	
+	private String appId;
 	private String timeStamp;
 	private String nonceStr;
 	private String prepay_id;
 	private String signType;
 	private String paySign;
+	
+	
+	
+	public String getAppId() {
+		return appId;
+	}
+	public void setAppId(String appId) {
+		this.appId = appId;
+	}
 	public String getTimeStamp() {
 		return timeStamp;
 	}

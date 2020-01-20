@@ -205,8 +205,8 @@ public class OrderService {
 					throw new ServiceException("销售品【"+good.getSales_id()+"】扣减库存失败");
 				}
 				
-				order_amount += good.getSales_price();
-				pay_amount += good.getSales_price();
+				order_amount += good.getSales_price()*good.getQty();
+				pay_amount += good.getSales_price()*good.getQty();
 				
 			}
 			
@@ -300,12 +300,16 @@ public class OrderService {
 	
 	public int cancelOrder(Long user_id,String order_id) throws ServiceException{
 		try {
-			Sql sql = new Sql(" select user_id,order_id,order_status,order_amount,pay_amount,order_remark,DATE_FORMAT(create_time,'%Y-%m-%d %H:%i:%s') create_time,delivery_mode,delivery_name,delivery_phone,delivery_address,delivery_send,express_company,express_number,express_freight from art_order_info where order_id = ? and user_id = ? ");
+			Sql sql = new Sql(" select user_id,order_id,order_status,order_amount,pay_amount from art_order_info where order_id = ? and user_id = ? ");
 			sql.addParam(order_id,user_id);
 			
 			OrderDetailResponse order = jdbcTemplate.findObject(sql, OrderDetailResponse.class);
-			if(order == null || order.getOrder_status().intValue() != 1) {
+			if(order == null) {
 				throw new ServiceException("订单【"+order_id+"】不存在");
+			}
+			
+			if(order.getOrder_status().intValue() != 1) {
+				throw new ServiceException("订单【"+order_id+"】不是待支付，无法取消");
 			}
 			
 			Date current_time = new Date();
@@ -317,13 +321,12 @@ public class OrderService {
 				throw new ServiceException("订单号【"+order_id+"】扣减库存失败");
 			}
 			
-			Sql sku = new Sql(" update art_prod_sku set sku_stock = ?,modify_time = ? where sku_id = ? ");
-			//sku.addParam(stock - good.getQty(),current_time,good.getSku_id());
-			int sku_result = jdbcTemplate.updateObject(sku);
-			if(sku_result == 0) {
-				throw new ServiceException("订单号【"+order_id+"】扣减库存失败");
-			}
-			
+			Sql orderSql = new Sql(" update art_order_info set order_status = 5,update_time = ? where order_id = ? ");
+			orderSql.addParam(current_time,order_id);
+			int order_result = jdbcTemplate.updateObject(orderSql);
+			if(order_result == 0) {
+				throw new ServiceException("订单号【"+order_id+"】状态更新失败");
+			}			
 			
 			return 1;
 		}catch(Exception e) {
@@ -332,6 +335,34 @@ public class OrderService {
 		}
 	}
 	
-	
+	public int confirmOrder(Long user_id,String order_id) throws ServiceException{
+		try {
+			Sql sql = new Sql(" select user_id,order_id,order_status,order_amount,pay_amount from art_order_info where order_id = ? and user_id = ? ");
+			sql.addParam(order_id,user_id);
+			
+			OrderDetailResponse order = jdbcTemplate.findObject(sql, OrderDetailResponse.class);
+			if(order == null) {
+				throw new ServiceException("订单【"+order_id+"】不存在");
+			}
+			
+			if(order.getOrder_status().intValue() != 3) {
+				throw new ServiceException("订单【"+order_id+"】不是待收货，无法确认收货");
+			}
+			
+			Date current_time = new Date();
+			
+			Sql orderSql = new Sql(" update art_order_info set order_status = 4,update_time = ? where order_id = ? ");
+			orderSql.addParam(current_time,order_id);
+			int order_result = jdbcTemplate.updateObject(orderSql);
+			if(order_result == 0) {
+				throw new ServiceException("订单号【"+order_id+"】状态更新失败");
+			}	
+			
+			return 1;
+		}catch(Exception e) {
+			log.logError("订单确认收货错误", e);
+			throw new ServiceException("订单确认收货错误："+e.getMessage());
+		}
+	}
 	
 }
