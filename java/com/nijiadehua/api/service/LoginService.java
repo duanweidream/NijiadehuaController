@@ -67,8 +67,8 @@ public class LoginService {
 				loginResponse.setPhone(user.getPhone());
 				return loginResponse;
 			}else {
-				Sql sql = new Sql(" update art_user_info set `wx_name`=?,`wx_img`=?,`wx_sex`=?,`phone`=?,`login_count`=`login_count`+1,`last_login_time`=?");
-				sql.addParam(loginRequest.getUser().getWx_name(),loginRequest.getUser().getWx_img(),loginRequest.getUser().getWx_sex(),loginRequest.getUser().getPhone(),currentTime);
+				Sql sql = new Sql(" update art_user_info set `wx_name`=?,`wx_img`=?,`wx_sex`=?,`phone`=?,`login_count`=`login_count`+1,`last_login_time`=? where wx_id = ? ");
+				sql.addParam(loginRequest.getUser().getWx_name(),loginRequest.getUser().getWx_img(),loginRequest.getUser().getWx_sex(),loginRequest.getUser().getPhone(),currentTime,loginResponse.getWx_id());
 				int result = jdbcTemplate.updateObject(sql);
 				if(result == 0) {
 					throw new ServiceException("数据执行错误");

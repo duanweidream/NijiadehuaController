@@ -77,7 +77,7 @@ public class MingjiaOrderController{
 	
 	@ResponseBody
 	@RequestMapping(value="/search",method=RequestMethod.GET)
-	public Result search(Long user_id,Long status,String startIndex,String itemCount) throws Exception {
+	public Result search(Long user_id,Long status,Integer currentPage) throws Exception {
 		
 		try {
 			
@@ -85,10 +85,7 @@ public class MingjiaOrderController{
 				return new Result(ApiError.Type.INVALID_PARAM.toException("参数错误!"));
 			}
 			
-			Integer startIndex1 = NumberUtil.getInteger(startIndex, 0);
-			Integer itemCount1 =  NumberUtil.getInteger(itemCount, 10);
-			
-			Page page = new Page(startIndex1, itemCount1, null);
+			Page page = new Page(currentPage);
 			
 			
 			orderService.searchOrderForPage(page,user_id,status);

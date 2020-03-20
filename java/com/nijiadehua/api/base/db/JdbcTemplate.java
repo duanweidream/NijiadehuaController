@@ -44,7 +44,6 @@ public class JdbcTemplate {
 	}
 	
 	public void search(Page page,Sql sql,Class toType) throws ApiError{
-		//page.totalCount=queryCount(sql);
 		page.setTotalCount(queryCount(sql));
 		sql.limit(page.startIndex, page.itemCount);
 		page.list=queryForList(sql, toType);

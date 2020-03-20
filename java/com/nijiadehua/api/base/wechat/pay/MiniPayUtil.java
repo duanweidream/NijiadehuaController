@@ -24,7 +24,7 @@ public class MiniPayUtil {
 	public static String APP_ID		= "wx6e2a2a319598b1e5";	//appid
 	public static String APP_SECRET	= "e5dad9e4ff67e4916e1eb75ed5521f32";	//appsecret
 	
-	public static String NOTIFY_URL	= "https://a.yuchengmedia.com.cn/v/1/pay/notify"; //"http://inner.hua1000.com/order/notify";  //支付完成后的回调处理页面,*替换成notify_url.asp所在路径
+	public static String NOTIFY_URL	= "https://api.qljtfw.com/mini/v/1/pay/notify"; //"http://inner.hua1000.com/order/notify";  //支付完成后的回调处理页面,*替换成notify_url.asp所在路径
 	public static String charset="utf-8";
     public static final String FAIL     = "FAIL";
     public static final String SUCCESS  = "SUCCESS";

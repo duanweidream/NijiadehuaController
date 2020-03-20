@@ -3,17 +3,14 @@ package com.nijiadehua.api.model;
 import java.util.List;
 
 public class Page {
-	public Integer totalCount=0,startIndex,itemCount,currentPage=0,totalPage=0;
-	public String queryString;
+	public Integer totalCount=0,startIndex=0,itemCount=10,currentPage=0,totalPage=0;
 	public List<?> list=null;
 	
-	public Page(Integer startIndex,Integer itemCount,String queryString){
-		this.startIndex=startIndex;
-		this.itemCount=itemCount;
-		this.queryString=queryString;
-		this.currentPage=(startIndex/itemCount)+1;
+	public Page(Integer currentPage){
+		this.currentPage=currentPage;
+		this.startIndex=(currentPage - 1)*itemCount;
 	}
-
+	
 	public Integer getTotalCount() {
 		return totalCount;
 	}

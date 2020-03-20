@@ -37,13 +37,11 @@ public class MingjiaSalesController {
 
 	@ResponseBody
 	@RequestMapping(value="/search",method=RequestMethod.GET)
-	public Result search(String sort_code,String startIndex,String itemCount) throws Exception {
+	public Result search(String sort_code,Integer currentPage) throws Exception {
 		
 		try {
-			Integer startIndex1 = NumberUtil.getInteger(startIndex, 0);
-			Integer itemCount1 =  NumberUtil.getInteger(itemCount, 10);
 			
-			Page page = new Page(startIndex1, itemCount1, null);
+			Page page = new Page(currentPage);
 			
 			SalesService salesService = new SalesService();
 			
